@@ -1,0 +1,132 @@
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/Montserrat-Light.ttf') format('opentype');
+}
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 500;
+  src: url('../fonts/Montserrat-Regular.ttf') format('opentype');
+}
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 700;
+  src: url('../fonts/Montserrat-Bold.ttf') format('opentype');
+}
+
+html, body {
+  box-sizing: border-box;
+  font-family: 'Montserrat' !important;
+  font-weight: 400 !important;
+  margin: 0;
+  padding: 0;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+a {
+  text-decoration: none;
+}
+p {
+  display: flex;
+  align-self: center;
+  padding: 0;
+  margin: 0;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: inherit !important;
+  font-weight: 700 !important;
+}
+dl + dl {
+  margin-top: 16px;
+}
+dt {
+  color: var(--color-grey-raven);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+}
+dd {
+  color: var(--color-deep-blue);
+  font-size: 14px;
+  line-height: 20px;
+  margin-top: 4px;
+}
+input::placeholder {
+  color: var(--color-dark-grey) !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
+.modebar-btn--logo {
+  display: none;
+}
+
+.container {
+  padding: 0 15px;
+}
+
+@media (min-width: 575.98px){
+  .container {
+    max-width: 540px;
+    margin: auto;
+    padding: 0;
+  }
+}
+
+@media (min-width: 767.98px){
+  .container {
+    max-width: 720px;	
+  }
+}
+
+@media (min-width: 991.98px) {
+  .container {
+    max-width: 960px;
+  }
+}
+
+@media (min-width: 1199.98px){
+  .container {
+    max-width: 1140px;
+  }
+}
+
+
+.d-flex {
+  display: flex;
+}
+
+.align-center {
+  align-items: center;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.mt-4 {
+  margin-top: 16px;
+}
+
+.ml-2 {
+  margin-left: 8px;
+}
+
+.mr-2 {
+  margin-right: 8px;
+}
+
+.ml-auto {
+  margin-left: auto;
+}
