@@ -15,14 +15,6 @@ Vue.component('create-scatter', {
   template: CreateScatter, 
   data: () => {
     return {
-      paramsArray: [{
-        name: 'n',
-        value: [1, 2, 3, 4, 5]
-      }],
-      constsArray: [{
-        name: 'f',
-        value: 1
-      }],
       layout: {
         title: 'График',
         xaxis: {
@@ -33,17 +25,27 @@ Vue.component('create-scatter', {
         },
       },
       lines: [
-        {
-          name: 'y=cos(x)',
+        { 
+          name: 'y=f*x',
           declareType: 'byFunction',
           type: 'scatter',
           mode: 'lines',
-          value: 'y=cos(x)'
+          value: 'y=f*x',
+          constsArray: [{
+            name: 'f',
+            value: 1
+          }],
         }
       ]
     }
   },
   methods: {
+    removeConst (index, consIndex) {
+      this.lines[index].constsArray.splice(consIndex, 1)
+    },
+    addConst (index) {
+      this.lines[index].constsArray.push({ name: '', value: '' })
+    },
     getParamsValues (str) {
       return this.str.split(/,/)
     },
@@ -72,14 +74,15 @@ Vue.component('create-scatter', {
     },
     addLine () {
       this.lines.push({
+        id: uuid.v4(),
         declareType: 'byFunction',
         type: 'scatter',
         mode: 'lines',
         value: ''
       })
     },
-    createGraph () {
-      this.$emit('create', { values: this.lines, layout: this.layout })
+    onCreate () {
+      this.$emit('create', { values: this.lines, layout: this.layout,  })
     }
   }
 })
@@ -138,7 +141,7 @@ Vue.component('create-bar', {
         values: Array(this.titles.length).fill(0),
       })
     },
-    createGraph () {
+    onCreate () {
       this.bars = this.bars.map(bar => ({ ...bar, titles: this.titles }))
       this.$emit('create', { values: this.bars, layout: this.layout })
 
@@ -202,7 +205,7 @@ Vue.component('create-pie', {
     removeItem (index) {
       this.pies.splice(index, 1)
     },
-    createGraph () {
+    onCreate () {
       this.$emit('create', { values: this.pies, layout: this.layout })
 
       this.setDefault()
@@ -330,6 +333,12 @@ Vue.component('update-scatter', {
     graph: Object
   },
   methods: {
+    removeConst (index, consIndex) {
+      this.lines[index].constsArray.splice(consIndex, 1)
+    },
+    addConst (index) {
+      this.lines[index].constsArray.push({ name: '', value: '' })
+    },
     addPoint(index) {
       this.lines[index].value.push({
         x: '',
@@ -499,13 +508,21 @@ new Vue({
   el: '#app',
   data: () => {
     return {
+      error: null,
       action: 'create',
-      isVisibleMenu: false,
+      isVisibleMenu: true,
       // Массив графиков для отрисовки
       normalizedGraphs: [],
       // Массив графиков для восстановления
       graphs: []
     }
+  },
+  created () {
+    // this.graphs = newGraphs;
+
+    this.graphs.map(graph => {
+      this.onCreate({ values: graph.values, layout: graph.layout, type: graph.values[0].type })
+    })
   },
   methods: {
     removeGraph (index) {
@@ -542,7 +559,7 @@ new Vue({
           y: line.value.map(item => item.y),
         }
       } else if (line.declareType === 'byFunction') {
-        const { x, y } = this.createFunctionalLine(line.value, xMin, xMax)
+        const { x, y } = this.createFunctionalLine(line, xMin, xMax)
 
         return {
           name: line.value,
@@ -558,128 +575,149 @@ new Vue({
       return html.outerHTML
     },
     onUpdate ({values, layout, type, index}) {
-      this.graphs = this.graphs.map((graph, curIndex) => {
-        if (curIndex === index) {
-          graph = { values, layout, type }
-        }
+      this.error = null
+      try {
+        if (type === 'scatter') {
+          const normalizedLines = values.map(line => this.normalizeLine(line))
 
-        return graph
-      })
-
-      if (type === 'scatter') {
-        const normalizedLines = values.map(line => this.normalizeLine(line))
-        
-        this.normalizedGraphs = this.normalizedGraphs.map((graph, curIndex) => {
-          if (curIndex === index) {
-            graph = {
+          if (this.graphs.length > this.normalizedGraphs.length) {
+            this.normalizedGraphs.push({
               layout: JSON.parse(JSON.stringify(layout)),
               data: normalizedLines
+            })
+          } else {
+            this.normalizedGraphs = this.normalizedGraphs.map((graph, curIndex) => {
+              if (curIndex === index) {
+                graph = {
+                  layout: JSON.parse(JSON.stringify(layout)),
+                  data: normalizedLines
+                }
+              }
+    
+              return graph
+            })
+          }
+
+          console.log('here', this.normalizedGraphs);
+
+          if (values.some(value => value.declareType === 'byCoords')) {
+            const xArray = values.map(item => {
+              if (item.declareType === 'byCoords') {
+                return item.value.map(item => item.x)
+              } 
+              return [];
+            }).flat();
+            
+            const value = {
+              'xaxis.range[0]': Math.min(...xArray),
+              'xaxis.range[1]': Math.max(...xArray),
             }
+            
+            this.recount(value, index);
           }
-
-          return graph
-        })
-
-        if (values.some(value => value.declareType === 'byCoords')) {
-          const xArray = values.map(item => {
-            if (item.declareType === 'byCoords') {
-              return item.value.map(item => item.x)
-            } 
-            return [];
-          }).flat();
-          
-          const value = {
-            'xaxis.range[0]': Math.min(...xArray),
-            'xaxis.range[1]': Math.max(...xArray),
-          }
-          
-          this.recount(value, index);
         }
-      }
 
-      if (type === 'pie') {
-        const normalizedPies = values.map((pie, index) => this.normalizePie(pie, index / 2, index % 2))
+        if (type === 'pie') {
+          const normalizedPies = values.map((pie, index) => this.normalizePie(pie, index / 2, index % 2))
 
-        this.normalizedGraphs = this.normalizedGraphs.map((graph, curIndex) => {
-          if (curIndex === index) {
-            graph = {
-              layout: {
-                ...JSON.parse(JSON.stringify(layout)),
-                grid: { rows: Math.ceil(normalizedPies.length / 2), columns: normalizedPies.length === 1 ? 1 : 2 }
-              },
-              data: normalizedPies
+          this.normalizedGraphs = this.normalizedGraphs.map((graph, curIndex) => {
+            if (curIndex === index) {
+              graph = {
+                layout: {
+                  ...JSON.parse(JSON.stringify(layout)),
+                  grid: { rows: Math.ceil(normalizedPies.length / 2), columns: normalizedPies.length === 1 ? 1 : 2 }
+                },
+                data: normalizedPies
+              }
             }
+
+            return graph
+          })
+        }
+
+        if (type === 'bar') {
+          const normalizedBars = values.map(bar => this.normalizeBar(bar))
+
+          this.normalizedGraphs = this.normalizedGraphs.map((graph, curIndex) => {
+            if (curIndex === index) {
+              graph = {
+                layout: {
+                  ...JSON.parse(JSON.stringify(layout)),
+                  barmode: 'group'
+                },
+                data: normalizedBars
+              }
+            }
+
+            return graph
+          })
+        }
+
+        this.graphs = this.graphs.map((graph, curIndex) => {
+          if (curIndex === index) {
+            graph = { values, layout, type }
           }
 
           return graph
         })
-      }
-
-      if (type === 'bar') {
-        const normalizedBars = values.map(bar => this.normalizeBar(bar))
-
-        this.normalizedGraphs = this.normalizedGraphs.map((graph, curIndex) => {
-          if (curIndex === index) {
-            graph = {
-              layout: {
-                ...JSON.parse(JSON.stringify(layout)),
-                barmode: 'group'
-              },
-              data: normalizedBars
-            }
-          }
-
-          return graph
-        })
+      } catch (error) {
+        this.error = error;
       }
     },
     onCreate ({values, layout, type }) {
-      if (type === 'scatter') {
-        const normalizedLines = values.map(line => this.normalizeLine(line))
-
-        this.normalizedGraphs.push({
-          layout: JSON.parse(JSON.stringify(layout)),
-          data: normalizedLines
-        })
-
-        if (values.some(value => value.declareType === 'byCoords')) {
-          const xArray = values.map(item => {
-            if (item.declareType === 'byCoords') {
-              return item.value.map(item => item.x)
-            } 
-            return [];
-          }).flat();
-          
-          const value = {
-            'xaxis.range[0]': Math.min(...xArray),
-            'xaxis.range[1]': Math.max(...xArray),
+      this.error = null
+      this.graphs.push({ values, layout, type })
+      
+      try {
+        if (type === 'scatter') {
+          const normalizedLines = values.map(line => this.normalizeLine(line))
+  
+          this.normalizedGraphs.push({
+            layout: JSON.parse(JSON.stringify(layout)),
+            data: normalizedLines
+          })
+  
+          if (values.some(value => value.declareType === 'byCoords')) {
+            const xArray = values.map(item => {
+              if (item.declareType === 'byCoords') {
+                return item.value.map(item => item.x)
+              } 
+              return [];
+            }).flat();
+            
+            const value = {
+              'xaxis.range[0]': Math.min(...xArray),
+              'xaxis.range[1]': Math.max(...xArray),
+            }
+            
+            this.recount(value, this.graphs.length - 1);
           }
-          
-          this.recount(value, this.graphs.length - 1);
         }
-      }
-
-      if (type === 'pie') {
-        const normalizedPies = values.map((pie, index) => this.normalizePie(pie, index / 2, index % 2))
-
-        this.normalizedGraphs.push({
-          layout: {
-            ...layout,
-            grid: { rows: Math.ceil(normalizedPies.length / 2), columns: normalizedPies.length === 1 ? 1 : 2 }
-          },
-          data: normalizedPies
-        })
-      }
-
-      if (type === 'bar') {
-        const normalizedBars = values.map(bar => this.normalizeBar(bar))
-        this.normalizedGraphs.push({
-          layout: {
-            ...layout,
-            barmode: 'group'
-          },
-          data: normalizedBars
-        })
+  
+        if (type === 'pie') {
+          const normalizedPies = values.map((pie, index) => this.normalizePie(pie, index / 2, index % 2))
+  
+          this.normalizedGraphs.push({
+            layout: {
+              ...layout,
+              grid: { rows: Math.ceil(normalizedPies.length / 2), columns: normalizedPies.length === 1 ? 1 : 2 }
+            },
+            data: normalizedPies
+          })
+        }
+  
+        if (type === 'bar') {
+          const normalizedBars = values.map(bar => this.normalizeBar(bar))
+          this.normalizedGraphs.push({
+            layout: {
+              ...layout,
+              barmode: 'group'
+            },
+            data: normalizedBars
+          })
+        }
+      } catch (error) {
+        this.error = error;
       }
     },
     recount (value, index, type) {
@@ -700,17 +738,24 @@ new Vue({
         this.normalizedGraphs[index].data = normalizedLines;
       }
     },
-    createFunctionalLine (value, xMin = X_MIN, xMax = X_MAX) {
+    createFunctionalLine (line, xMin = X_MIN, xMax = X_MAX) {
       const dx = 0.1;
       const xArray = [], yArray = [];
       
-      const node = math.parse(value);
+      const node = math.parse(line.value);
+      const scope = new Map();
+      console.log(line.constsArray.length);
+      if (line.constsArray.length) {
+        line.constsArray.forEach(cons => {
+          scope.set(cons.name, math.evaluate(cons.value))
+        })
+      }
       
       for (let x = xMin; x < xMax; x += dx ) {
         const code = node.compile();
-
+        
         xArray.push(x);
-        yArray.push(code.evaluate({ x }));
+        yArray.push(code.evaluate({ x, ...Object.fromEntries(scope) }));
       }
       
       return {

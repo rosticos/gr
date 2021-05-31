@@ -103,6 +103,10 @@ input[type=number]::-webkit-outer-spin-button {
   }
 }
 
+.p-error {
+  color: var(--color-red)
+}
+
 .p-title,
 .p-title-bold {
   font-size: 18px;

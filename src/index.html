@@ -23,6 +23,7 @@
 
       <!-- import es6 module in main.js -->
       <script src="./components/plotly/plotly.js" type="module"></script>
+      <script src="./components/uuid/uuid.js" integrity="sha512-UNM1njAgOFUa74Z0bADwAq8gbTcqZC8Ej4xPSzpnh0l6KMevwvkBvbldF9uR++qKeJ+MOZHRjV1HZjoRvjDfNQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
       <script src="./components/index.js" type="module"></script>
     </head>
   <body>
@@ -53,12 +54,20 @@
         </section>
 
         <div class="container">
-          <div v-if="normalizedGraphs.length === 0" style="padding-top: 100px;">
+          <div v-if="error" style="padding-top: 100px;">
+            <p>- Ой, что-то пошло не так...</p>
+            <p>- А что делать?</p>
+            <p>- Зайди в раздел "Редактирование" и поправь параметры, указанные в ошибке</p>
+            <p class="p-error mt-2 mb-2">{{ error }}</p>
+            <p v-on:click="isVisibleMenu = true; action = 'edit';">-&nbsp;<b class="p-link">Редактировать?</b></p>
+          </div>
+
+          <div v-if="normalizedGraphs.length === 0 && !error" style="padding-top: 100px;">
             <p>- Пока нет графиков на полотне...</p>
             <p v-on:click="isVisibleMenu = true;">-&nbsp;<b class="p-link">Создать?</b></p>
           </div>
 
-          <div v-else v-for="(grapg, index) in normalizedGraphs" :key="index">
+          <div v-else v-for="(graph, index) in normalizedGraphs" :key="index">
             <div class="plotly">
               <div class="plotly__actions">
                 <div class="btn btn_outline ml-2" v-on:click="removeGraph(index)">
@@ -69,12 +78,12 @@
                   <div class="p-icon p-icon-edit"></div>
                 </div>
               </div>
-              
+             
               <plotly 
-                v-bind:data="grapg.data" 
-                v-bind:layout="grapg.layout" 
+                v-bind:data="graph.data" 
+                v-bind:layout="graph.layout" 
                 v-bind:display-mode-bar="true" 
-                v-on:relayout="recount($event, index)"
+                v-on:relayout="recount($event, index, graph.data[index].type)"
                 v-bind:scroll-zoom="true"
                 v-bind:mode-bar-buttons-to-remove="['lasso2d','zoom2d','resetScale2d','toggleSpikelines','producedWithPlotly']"
               ></plotly>

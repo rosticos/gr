@@ -3,7 +3,7 @@ export default `
   <div>
     <p class="p-title">Редактирование графиков</p>
   </div>
-  
+
   <div v-for="(graph, index) in graphs" :key="index">
     <div class="card__content">
       <div v-on:click="setExpand(index)">

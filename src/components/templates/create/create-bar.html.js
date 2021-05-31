@@ -50,7 +50,7 @@ export default `
         Добавить столбец
       </div>
 
-      <div class="btn btn_primary ml-auto" v-on:click="createGraph" v-if="layout.title !== ''">
+      <div class="btn btn_primary ml-auto" v-on:click="onCreate" v-if="layout.title !== ''">
         Создать
       </div>
     </div>

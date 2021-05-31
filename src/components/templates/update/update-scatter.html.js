@@ -36,6 +36,37 @@ export default `
           <p class="p-input__label">Функция (y=cos(x), y=sin(x) ...)</p>
           <input type="text" class="input-block" v-model="line.value">
         </div>
+
+        <div class="mt-2 card__content">
+          <div class="d-flex">
+            <p class="p-title">Константы</p>
+            <div class="btn btn_outline ml-auto" v-on:click="addConst(index)">
+              <div class="p-icon p-icon-add"></div>
+            </div>
+          </div>
+        
+          <div class="mt-2">
+            <div v-for="(cons, consIndex) in line.constsArray" :key="consIndex">
+              <div class="card__content d-flex">
+                <div>
+                  <p class="p-input__label">Название</p>
+                  <input type="text" class="input-block" v-model="cons.name">
+                </div>
+
+                <div class="ml-2">
+                  <p class="p-input__label">Значение</p>
+                  <input type="text" class="input-block" v-model="cons.value">
+                </div>
+
+                <div class="btn-container_s">
+                  <div class="btn btn_outline ml-2" v-on:click="removeConst(index, consIndex)">
+                    <div class="p-icon p-icon-close"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       
       <div v-if="line.declareType === 'byCoords'">

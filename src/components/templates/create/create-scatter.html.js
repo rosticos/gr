@@ -20,8 +20,10 @@ export default `<div>
         </select>
       </div>
 
-      <div class="btn btn_outline ml-2" v-on:click="addPoint(index)" v-if="line.declareType === 'byCoords'">
-        <div class="p-icon p-icon-add"></div>
+      <div class="btn-container_s">
+        <div class="btn btn_outline ml-2" v-on:click="addPoint(index)" v-if="line.declareType === 'byCoords'">
+          <div class="p-icon p-icon-add"></div>
+        </div>
       </div>
     </div>
 
@@ -34,6 +36,37 @@ export default `<div>
       <div class="mt-2">
         <p class="p-input__label">Функция (y=cos(x), y=sin(x) ...)</p>
         <input type="text" class="input-block" v-model="line.value">
+      </div>
+
+      <div class="mt-2 card__content">
+        <div class="d-flex">
+          <p class="p-title">Константы</p>
+          <div class="btn btn_outline ml-auto" v-on:click="addConst(index)">
+            <div class="p-icon p-icon-add"></div>
+          </div>
+        </div>
+        
+        <div class="mt-2">
+          <div v-for="(cons, consIndex) in line.constsArray" :key="consIndex">
+            <div class="card__content d-flex">
+              <div>
+                <p class="p-input__label">Название</p>
+                <input type="text" class="input-block" v-model="cons.name">
+              </div>
+
+              <div class="ml-2">
+                <p class="p-input__label">Значение</p>
+                <input type="text" class="input-block" v-model="cons.value">
+              </div>
+
+              <div class="btn-container_s">
+                <div class="btn btn_outline ml-2" v-on:click="removeConst(index, consIndex)">
+                  <div class="p-icon p-icon-close"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     
@@ -54,38 +87,12 @@ export default `<div>
           <input type="text" class="input-block" v-model="value.y">
         </div>  
 
-        <div class="btn btn_outline ml-2" v-on:click="removePoint(index, valueIndex)">
-          <div class="p-icon p-icon-close"></div>
+        <div class="btn-container_s">
+          <div class="btn btn_outline ml-2" v-on:click="removePoint(index, valueIndex)">
+            <div class="p-icon p-icon-close"></div>
+          </div>
         </div>
       </div> 
-    </div>
-  </div>
-
-  <div class="card__content">
-    <p class="p-title">Константы</p>
-    
-    <div class="mt-2 card__content">
-      <div v-for="(cons, consIndex) in constsArray" :key="consIndex">
-        <p class="p-input__label">Имя параметра</p>
-        <input type="text" class="input-block" v-model="cons.name">
-
-        <p class="p-input__label">Значение параметра</p>
-        <input type="text" class="input-block" v-model="cons.value">
-      </div>
-    </div>
-  </div>
-
-  <div class="card__content">
-    <p class="p-title">Параметры</p>
-    
-    <div class="mt-2 card__content">
-      <div v-for="(param, paramIndex) in paramsArray" :key="paramIndex">
-        <p class="p-input__label">Имя параметра</p>
-        <input type="text" class="input-block" v-model="param.name">
-
-        <p class="p-input__label">Значение параметра</p>
-        <input type="text" class="input-block" v-model="param.value">
-      </div>
     </div>
   </div>
 
@@ -116,7 +123,7 @@ export default `<div>
       Добавить график
     </div>
 
-    <div class="btn btn_primary ml-auto" v-on:click="createGraph" v-if="layout.title !== ''">
+    <div class="btn btn_primary ml-auto" v-on:click="onCreate" v-if="layout.title !== ''">
       Создать
     </div>
   </div>
