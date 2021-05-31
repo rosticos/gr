@@ -48,7 +48,7 @@
               <create-graph v-on:create="onCreate" />
             </div>
             <div class="section-container__content" v-else-if="action === 'edit' && graphs.length">
-              <update-graph v-on:update="onUpdate" v-bind:graphs="graphs"/>
+              <update-graph v-on:update="onUpdate" v-bind:graphs="graphs" v-bind:expand-item="expandItem"/>
             </div>
           </div>
         </section>
@@ -74,16 +74,16 @@
                   <div class="p-icon p-icon-close"></div>
                 </div>
                 
-                <div class="btn btn_outline ml-2" v-on:click="removePoint(index, valueIndex)">
+                <div class="btn btn_outline ml-2" v-on:click="setEditMode(index)">
                   <div class="p-icon p-icon-edit"></div>
                 </div>
               </div>
-             
+              
               <plotly 
                 v-bind:data="graph.data" 
                 v-bind:layout="graph.layout" 
                 v-bind:display-mode-bar="true" 
-                v-on:relayout="recount($event, index, graph.data[index].type)"
+                v-on:relayout="recount($event, index, graph.data[0].type)"
                 v-bind:scroll-zoom="true"
                 v-bind:mode-bar-buttons-to-remove="['lasso2d','zoom2d','resetScale2d','toggleSpikelines','producedWithPlotly']"
               ></plotly>

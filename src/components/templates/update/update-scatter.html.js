@@ -37,6 +37,11 @@ export default `
           <input type="text" class="input-block" v-model="line.value">
         </div>
 
+        <div class="mt-2">
+          <p class="p-input__label">Построит функцию относительно ... (x)</p>
+          <input type="text" class="input-block" v-model="line.funcRelative">
+        </div>
+
         <div class="mt-2 card__content">
           <div class="d-flex">
             <p class="p-title">Константы</p>

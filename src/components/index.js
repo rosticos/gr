@@ -27,6 +27,7 @@ Vue.component('create-scatter', {
       lines: [
         { 
           name: 'y=f*x',
+          funcRelative: 'x',
           declareType: 'byFunction',
           type: 'scatter',
           mode: 'lines',
@@ -74,7 +75,8 @@ Vue.component('create-scatter', {
     },
     addLine () {
       this.lines.push({
-        id: uuid.v4(),
+        constsArray: [],
+        funcRelative: 'x',
         declareType: 'byFunction',
         type: 'scatter',
         mode: 'lines',
@@ -82,7 +84,7 @@ Vue.component('create-scatter', {
       })
     },
     onCreate () {
-      this.$emit('create', { values: this.lines, layout: this.layout,  })
+      this.$emit('create', { values: this.lines, layout: this.layout })
     }
   }
 })
@@ -259,16 +261,31 @@ Vue.component('update-graph', {
   template: UpdateGraph,
   props: {
     graphs: Array,
-    type: String
+    type: String,
+    expandItem: {
+      type: [Number, Object],
+      default: null
+    }
   },
   data: () => {
     return {
       expanded: []
     }
   },
+  watch: {
+    expandItem: {
+      immediate: true,
+      handler (value) {
+        if (value != null) {
+          this.setExpand(value, true);
+        }
+      }
+    }
+  },
   methods: {
-    setExpand (index) {
-      if (this.expanded.includes(index)) {
+    setExpand (index, isDirect = false) {
+      console.log('🚀 ~ file: index.js ~ line 285 ~ setExpand ~ index', index)
+      if (this.expanded.includes(index) && !isDirect) {
         this.expanded = this.expanded.filter(expand => expand !== index)
       } else {
         this.expanded.push(index)
@@ -364,6 +381,8 @@ Vue.component('update-scatter', {
     },
     addLine () {
       this.lines.push({
+        constsArray: [],
+        funcRelative: 'x',
         declareType: 'byFunction',
         type: 'scatter',
         mode: 'lines',
@@ -508,9 +527,10 @@ new Vue({
   el: '#app',
   data: () => {
     return {
+      expandItem: null,
       error: null,
       action: 'create',
-      isVisibleMenu: true,
+      isVisibleMenu: false,
       // Массив графиков для отрисовки
       normalizedGraphs: [],
       // Массив графиков для восстановления
@@ -518,13 +538,17 @@ new Vue({
     }
   },
   created () {
-    // this.graphs = newGraphs;
-
     this.graphs.map(graph => {
       this.onCreate({ values: graph.values, layout: graph.layout, type: graph.values[0].type })
     })
   },
   methods: {
+    setEditMode (index) {
+      this.isVisibleMenu = true
+      this.action = 'edit'
+
+      this.expandItem = index
+    },
     removeGraph (index) {
       this.normalizedGraphs.splice(index, 1)
       this.graphs.splice(index, 1)
@@ -597,8 +621,6 @@ new Vue({
               return graph
             })
           }
-
-          console.log('here', this.normalizedGraphs);
 
           if (values.some(value => value.declareType === 'byCoords')) {
             const xArray = values.map(item => {
@@ -744,7 +766,7 @@ new Vue({
       
       const node = math.parse(line.value);
       const scope = new Map();
-      console.log(line.constsArray.length);
+      
       if (line.constsArray.length) {
         line.constsArray.forEach(cons => {
           scope.set(cons.name, math.evaluate(cons.value))
@@ -755,7 +777,7 @@ new Vue({
         const code = node.compile();
         
         xArray.push(x);
-        yArray.push(code.evaluate({ x, ...Object.fromEntries(scope) }));
+        yArray.push(code.evaluate({ [line.funcRelative]:x, ...Object.fromEntries(scope) }));
       }
       
       return {

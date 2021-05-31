@@ -7,7 +7,7 @@ export default `
   <div v-for="(graph, index) in graphs" :key="index">
     <div class="card__content">
       <div v-on:click="setExpand(index)">
-        <p class="p-title-bold">{{ graph.layout.title }}</p>
+        <p style="cursor: pointer;" class="p-title-bold">{{ graph.layout.title }}</p>
       </div>
       <component
         v-if="expanded.includes(index)"
