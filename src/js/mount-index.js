@@ -1,5 +1,5 @@
-const X_MIN = -3
-const X_MAX = 3
+const X_MIN = -30
+const X_MAX = 30
 
 import { default as CreateScatter } from './templates/create/create-scatter.html.js'
 import { default as CreateBar } from './templates/create/create-bar.html.js'

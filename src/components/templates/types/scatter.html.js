@@ -1,6 +1,15 @@
 export default `<div>
-  <div class="card__content" v-for="(line, index) in lines" :key="index">
-    <div class="d-flex">
+  <div v-for="(line, index) in lines" :key="index">
+    <hr>
+    <div class="card__content d-flex">
+      <p class="p-title-bold">{{ line.name || 'Новая линия' }}</p>
+      <div class="ml-auto btn btn_outline ml-2" v-on:click="removeLine(index)">
+        <div class="p-icon p-icon-close"></div>
+      </div>
+    </div>
+    <hr>
+    
+    <div class="card__content d-flex pb-0">
       <div>
         <p class="p-input__label">Название линии</p>
         <select v-model="line.declareType" v-on:change="onChangeDeclareType(index)" class="input-block select-css">
@@ -27,8 +36,8 @@ export default `<div>
       </div>
     </div>
 
-    <div v-if="line.declareType === 'byFunction'" class="mt-2">
-      <div class="mt-2">
+    <div v-if="line.declareType === 'byFunction'" class=" pt-0 card__content">
+      <div>
         <p class="p-input__label">Название линии</p>
         <input type="text" class="input-block" v-model="line.name">
       </div>
@@ -43,17 +52,17 @@ export default `<div>
         <input type="text" class="input-block" v-model="line.funcRelative">
       </div>
 
-      <div class="mt-2 card__content">
-        <div class="d-flex">
-          <p class="p-title">Константы</p>
-          <div class="btn btn_outline ml-auto" v-on:click="addConst(index)">
-            <div class="p-icon p-icon-add"></div>
-          </div>
+      <div class="d-flex my-4">
+        <p class="p-title">Константы</p>
+        <div class="btn btn_outline ml-auto" v-on:click="addConst(index)">
+          <div class="p-icon p-icon-add"></div>
         </div>
-        
+      </div>
+
+      <div>
         <div class="mt-2">
           <div v-for="(cons, consIndex) in line.constsArray" :key="consIndex">
-            <div class="card__content d-flex">
+            <div class="d-flex">
               <div>
                 <p class="p-input__label">Название</p>
                 <input type="text" class="input-block" v-model="cons.name">
@@ -101,35 +110,53 @@ export default `<div>
     </div>
   </div>
 
+  <hr>
   <div class="card__content">
     <p class="p-title">Настроить график</p>
-    
-    <div class="mt-2 card__content">
+  </div>
+  <hr>
+
+  <div class="card__content">
+    <div>
       <p class="p-input__label">Название графика</p>
       <input type="text" class="input-block" v-model="layout.title">
     </div>
 
-    <div class="d-flex mt-2">
-      <div>
-        <p class="p-input__label">Горизонталь</p>
-        <input type="text" class="input-block" v-model="layout.xaxis.title">
-      </div>
+    <div>
+      <p class="p-input__label">Горизонталь</p>
+      <input type="text" class="input-block" v-model="layout.xaxis.title">
+    </div>
 
-      <div>
-        <p class="p-input__label">Вертикаль</p>
-        <input type="text" class="input-block ml-2" v-model="layout.yaxis.title">
+    <div>
+      <p class="p-input__label">Вертикаль</p>
+      <input type="text" class="input-block" v-model="layout.yaxis.title">
+    </div>
+
+    <div>
+      <p class="p-input__label">Начальная область по горизонтале:</p>
+      <div class="d-flex">
+        <input type="text" class="input-block" v-model.number="layout.xaxis.range[0]">
+        <input type="text" class="input-block" v-model.number="layout.xaxis.range[1]">
+      </div>
+    </div>
+
+    <div>
+      <p class="p-input__label">Начальная область по горизонтале:</p>
+      <div class="d-flex">
+        <input type="text" class="input-block" v-model.number="layout.yaxis.range[0]">
+        <input type="text" class="input-block" v-model.number="layout.yaxis.range[1]">
       </div>
     </div>
   </div>
 
-  <div class="card__actions">
+  <div class="card__content card__actions">
     <div class="btn btn_outline" v-on:click="addLine">
       <div class="p-icon p-icon-add mr-2"></div>
       Добавить график
     </div>
 
-    <div class="btn btn_primary ml-auto" v-on:click="onCreate" v-if="layout.title !== ''">
-      Создать
+    <div class="btn btn_primary ml-auto" v-on:click="submit" v-if="layout.title !== ''">
+      {{ submitText }}
     </div>
   </div>
 </div>`

@@ -1,27 +1,135 @@
-const X_MIN = -3
-const X_MAX = 3
+const X_MIN = -30
+const X_MAX = 30
 
-import { default as CreateScatter } from './templates/create/create-scatter.html.js'
-import { default as CreateBar } from './templates/create/create-bar.html.js'
-import { default as CreatePie } from './templates/create/create-pie.html.js'
-import { default as CreateGraph } from './templates/create/create-graph.html.js'
+import { default as Scatter } from './templates/types/scatter.html.js'
+import { default as Bar } from './templates/types/bar.html.js'
+import { default as Pie } from './templates/types/pie.html.js'
+import { default as CreateForm } from './templates/forms/create-form.html.js'
+import { default as UpdateForm } from './templates/forms/update-form.html.js'
 
-import { default as UpdateGraph } from './templates/update/update-graph.html.js'
-import { default as UpdateScatter } from './templates/update/update-scatter.html.js'
-import { default as UpdateBar } from './templates/update/update-bar.html.js'
-import { default as UpdatePie } from './templates/update/update-pie.html.js'
+Vue.component('create-graph', {
+  template: CreateForm,
+  data: function () {
+    return {
+      type: ''
+    }
+  },
+  computed: {
+    getActiveComponent () {
+      let component = ''
 
-Vue.component('create-scatter', {
-  template: CreateScatter, 
+      switch (this.type) {
+        case 'scatter':
+          component = 'create-scatter'
+          break;
+        
+        case 'bar':
+          component = 'create-bar'
+          break;
+
+        case 'pie':
+          component = 'create-pie'
+          break;
+        
+        default:
+          break;
+      }
+
+      return component;
+    }
+  },
+  methods: {
+    onCreate ({ values, layout }) {
+      this.$emit('create', { values, layout, type: this.type })
+      this.type = ''
+    },
+    addLine () {
+      // 
+    }
+  }
+})
+
+Vue.component('update-graph', {
+  template: UpdateForm,
+  props: {
+    graphs: Array,
+    type: String,
+    expandItem: {
+      type: [Number, Object],
+      default: null
+    }
+  },
   data: () => {
     return {
+      expanded: []
+    }
+  },
+  watch: {
+    expandItem: {
+      immediate: true,
+      handler (value) {
+        if (value != null) {
+          this.setExpand(value, true);
+        }
+      }
+    }
+  },
+  methods: {
+    setExpand (index, isDirect = false) {
+      if (this.expanded.includes(index) && !isDirect) {
+        this.expanded = this.expanded.filter(expand => expand !== index)
+      } else {
+        this.expanded.push(index)
+      }
+    },
+    isExpanded (index) {
+      return this.expanded.includes(index)
+    },
+    getActiveComponent (type) {
+      let component = ''
+
+      switch (type) {
+        case 'scatter':
+          component = 'update-scatter'
+          break;
+        
+        case 'bar':
+          component = 'update-bar'
+          break;
+
+        case 'pie':
+          component = 'update-pie'
+          break;
+        
+        default:
+          break;
+      }
+
+      return component;
+    },
+    onUpdate ({ values, layout }, type, index) {
+      this.$emit('update', { values, layout, type, index})
+    },
+    addLine () {
+      // 
+    }
+  }
+})
+
+const createScatter = Vue.component('create-scatter', {
+  template: Scatter, 
+  data: () => {
+    return {
+      submitText: 'Создать',
       layout: {
         title: 'График',
         xaxis: {
-          title: 'X'
+          title: 'X',
+          range: [ -30, 30 ]
         },
         yaxis: {
-          title: 'Y'
+          title: 'Y',
+          range: [ -30, 30 ]
         },
       },
       lines: [
@@ -41,6 +149,9 @@ Vue.component('create-scatter', {
     }
   },
   methods: {
+    removeLine (index) {
+      this.lines.splice(index, 1)
+    },
     removeConst (index, consIndex) {
       this.lines[index].constsArray.splice(consIndex, 1)
     },
@@ -83,16 +194,17 @@ Vue.component('create-scatter', {
         value: ''
       })
     },
-    onCreate () {
+    submit () {
       this.$emit('create', { values: this.lines, layout: this.layout })
     }
   }
 })
 
-Vue.component('create-bar', {
-  template: CreateBar,
+const createBar = Vue.component('create-bar', {
+  template: Bar,
   data: () => {
     return {
+      submitText: 'Создать',
       layout: {
         title: 'Столбцы'
       },
@@ -143,7 +255,7 @@ Vue.component('create-bar', {
         values: Array(this.titles.length).fill(0),
       })
     },
-    onCreate () {
+    submit () {
       this.bars = this.bars.map(bar => ({ ...bar, titles: this.titles }))
       this.$emit('create', { values: this.bars, layout: this.layout })
 
@@ -152,10 +264,11 @@ Vue.component('create-bar', {
   }
 })
 
-Vue.component('create-pie', {
-  template: CreatePie,
+const createPie = Vue.component('create-pie', {
+  template: Pie,
   data: () => {
     return {
+      submitText: 'Создать',
       layout: {
         title: 'Круговая диаграмма'
       },
@@ -207,7 +320,7 @@ Vue.component('create-pie', {
     removeItem (index) {
       this.pies.splice(index, 1)
     },
-    onCreate () {
+    submit () {
       this.$emit('create', { values: this.pies, layout: this.layout })
 
       this.setDefault()
@@ -215,181 +328,19 @@ Vue.component('create-pie', {
   }
 })
 
-Vue.component('create-graph', {
-  template: CreateGraph,
-  data: function () {
-    return {
-      type: ''
-    }
-  },
-  computed: {
-    getActiveComponent () {
-      let component = ''
-
-      switch (this.type) {
-        case 'scatter':
-          component = 'create-scatter'
-          break;
-        
-        case 'bar':
-          component = 'create-bar'
-          break;
-
-        case 'pie':
-          component = 'create-pie'
-          break;
-        
-        default:
-          break;
-      }
-
-      return component;
-    }
-  },
-  methods: {
-    onCreate ({ values, layout }) {
-      this.$emit('create', { values, layout, type: this.type })
-      this.type = ''
-    },
-    addLine () {
-      // 
-    }
-  }
-})
-
-Vue.component('update-graph', {
-  template: UpdateGraph,
-  props: {
-    graphs: Array,
-    type: String,
-    expandItem: {
-      type: [Number, Object],
-      default: null
-    }
-  },
-  data: () => {
-    return {
-      expanded: []
-    }
-  },
-  watch: {
-    expandItem: {
-      immediate: true,
-      handler (value) {
-        if (value != null) {
-          this.setExpand(value, true);
-        }
-      }
-    }
-  },
-  methods: {
-    setExpand (index, isDirect = false) {
-      console.log('🚀 ~ file: index.js ~ line 285 ~ setExpand ~ index', index)
-      if (this.expanded.includes(index) && !isDirect) {
-        this.expanded = this.expanded.filter(expand => expand !== index)
-      } else {
-        this.expanded.push(index)
-      }
-    },
-    getActiveComponent (type) {
-      let component = ''
-
-      switch (type) {
-        case 'scatter':
-          component = 'update-scatter'
-          break;
-        
-        case 'bar':
-          component = 'update-bar'
-          break;
-
-        case 'pie':
-          component = 'update-pie'
-          break;
-        
-        default:
-          break;
-      }
-
-      return component;
-    },
-    onUpdate ({ values, layout }, type, index) {
-      this.$emit('update', { values, layout, type, index})
-    },
-    addLine () {
-      // 
-    }
-  }
-})
-
 Vue.component('update-scatter', {
-  template: UpdateScatter,
-  data: () => {
-    return {
-      layout: {
-        title: 'График',
-        xaxis: {
-          title: 'X'
-        },
-        yaxis: {
-          title: 'Y'
-        },
-      },
-      lines: [
-        {
-          name: '',
-          declareType: 'byFunction',
-          type: 'scatter',
-          mode: 'lines',
-          value: ''
-        }
-      ]
-    }
-  },
+  template: Scatter,
+  extends: createScatter,
   props: {
     graph: Object
   },
+  data: () => {
+    return {
+      submitText: 'Обновить',
+    }
+  },
   methods: {
-    removeConst (index, consIndex) {
-      this.lines[index].constsArray.splice(consIndex, 1)
-    },
-    addConst (index) {
-      this.lines[index].constsArray.push({ name: '', value: '' })
-    },
-    addPoint(index) {
-      this.lines[index].value.push({
-        x: '',
-        y: ''
-      })
-    },
-    removePoint(index, rmIndex) {
-      this.lines[index].value.splice(rmIndex, 1)
-    },
-    onChangeDeclareType (index) {
-      if (this.lines[index].declareType === 'byFunction') {
-        this.lines[index].value = ''
-      } else if (this.lines[index].declareType === 'byCoords') {
-        this.lines[index].value = [{
-          x: '',
-          y: ''
-        }]
-      }
-
-    },
-    add () {
-      this.$emit('add', this.graph)
-    },
-    addLine () {
-      this.lines.push({
-        constsArray: [],
-        funcRelative: 'x',
-        declareType: 'byFunction',
-        type: 'scatter',
-        mode: 'lines',
-        value: ''
-      })
-    },
-    updateGraph () {
+    submit () {
       this.$emit('update', { values: this.lines, layout: this.layout })
     }
   },
@@ -400,120 +351,42 @@ Vue.component('update-scatter', {
 })
 
 Vue.component('update-bar', {
-  template: UpdateBar,
+  template: Bar,
+  extends: createBar,
   data: () => {
     return {
-      layout: {
-        title: ''
-      },
-      titles: ['Название столбца'],
-      bars: [
-        {
-          counter: 1,
-          type: 'bar',
-          name: '',
-          values: [],
-        }
-      ]
+      submitText: 'Обновить',
     }
   },
   props: {
     graph: Object
   },
   methods: {
-    setDefault () {
-      this.bars = [
-        {
-          counter: 1,
-          type: 'bar',
-          name: '',
-          values: [],
-        }
-      ]
-    },
-    removeBarTitle (index) {
-      this.titles.splice(index, 1)
-      this.bars.forEach(bar => {
-        bar.values.splice(index, 1);
-        bar.counter -= 1;
-      })
-    },
-    removeBar (index) {
-      this.bars.splice(index, 1);
-    },
-    addItem () {
-      this.titles.push('')
-      this.bars.forEach(bar => {
-        bar.values = [...bar.values, 0];
-        bar.counter += 1;
-      })
-    },
-    addBar () {
-      this.bars.push({
-        counter: this.titles.length,
-        type: 'bar',
-        name: '',
-        values: Array(this.titles.length).fill(0),
-      })
-    },
-    updateGraph () {
+    submit () {
       this.bars = this.bars.map(bar => ({ ...bar, titles: this.titles }))
       this.$emit('update', { values: this.bars, layout: this.layout })
     }
   },
   mounted () {
+    this.titles = this.graph.values[0].titles;
     this.bars = this.graph.values;
     this.layout = this.graph.layout;
   }
 })
 
 Vue.component('update-pie', {
-  template: UpdatePie,
+  template: Pie,
+  extends: createPie,
   data: () => {
     return {
-      layout: {
-        title: ''
-      },
-      pies: [
-        {
-          counter: 3,
-          type: 'pie',
-          textinfo: "label+percent",
-          values: [],
-          labels: [],
-          insidetextorientation: "radial"
-        }
-      ]
+      submitText: 'Обновить',
     }
   },
   props: {
     graph: Object
   },
   methods: {
-    removeItem (index) {
-      this.pies.splice(index, 1)
-    },
-    removePieItem (index, pieIndex) {
-      this.pies[index].counter -= 1;
-      this.pies[index].values.splice(pieIndex, 1);
-      this.pies[index].labels.splice(pieIndex, 1);
-    },
-    addItem (index) {
-      this.pies[index].counter += 1;
-      this.pies[index].values.push('');
-      this.pies[index].labels.push('');
-    },
-    addPie () {
-      this.pies.push({
-        counter: 1,
-        type: 'pie',
-        textinfo: "label+percent",
-        values: [0],
-        labels: [''],
-        insidetextorientation: "radial"
-      })
-    },
-    updateGraph () {
+    submit () {
       this.$emit('update', { values: this.pies, layout: this.layout })
     }
   },
@@ -530,16 +403,45 @@ new Vue({
       expandItem: null,
       error: null,
       action: 'create',
-      isVisibleMenu: false,
+      isVisibleMenu: true,
       // Массив графиков для отрисовки
       normalizedGraphs: [],
       // Массив графиков для восстановления
-      graphs: []
+      graphs: [{
+        "values": [{
+          "name": "y=f*x",
+          "funcRelative": "x",
+          "declareType": "byFunction",
+          "type": "scatter",
+          "mode": "lines",
+          "value": "y=f*x",
+          "constsArray": [{
+            "name": "f",
+            "value": 1
+          }]
+        }],
+        "layout": {
+          "title": "График",
+          "xaxis": {
+            "title": "X",
+            "range": [-30, 30]
+          },
+          "yaxis": {
+            "title": "Y",
+            "range": [-30, 30]
+          }
+        },
+        "type": "scatter"
+      }]
     }
   },
   created () {
     this.graphs.map(graph => {
-      this.onCreate({ values: graph.values, layout: graph.layout, type: graph.values[0].type })
+      this.onCreate({ 
+        values: graph.values, 
+        layout: graph.layout, 
+        type: graph.values[0].type 
+      }, true)
     })
   },
   methods: {
@@ -686,9 +588,12 @@ new Vue({
         this.error = error;
       }
     },
-    onCreate ({values, layout, type }) {
+    onCreate ({values, layout, type }, isMountEvent = false) {
       this.error = null
-      this.graphs.push({ values, layout, type })
+
+      if (!isMountEvent) {
+        this.graphs.push({ values, layout, type })
+      }
       
       try {
         if (type === 'scatter') {
@@ -745,23 +650,26 @@ new Vue({
     recount (value, index, type) {
       if (type === 'scatter') {
         const lines = this.graphs[index].values;
+        
+        if (value?.['xaxis.range[0]'] && value?.['xaxis.range[1]']) {
+          const normalizedLines = lines.map(line => {
+            if (line.declareType === 'byFunction' && (value?.['xaxis.range[0]'] < X_MIN || value?.['xaxis.range[1]'] > X_MAX)) {
+            
+              const [ xMin, xMax ] = [value['xaxis.range[0]'], value['xaxis.range[1]']]
 
-        const normalizedLines = lines.map(line => {
-          if (line.declareType === 'byFunction' && (value?.['xaxis.range[0]'] < X_MIN || value?.['xaxis.range[1]'] > X_MAX)) {
-          
-            const [ xMin, xMax ] = [value['xaxis.range[0]'], value['xaxis.range[1]']]
+              return this.normalizeLine(line, xMin, xMax)
+            }
 
-            return this.normalizeLine(line, xMin, xMax)
-          }
+            return this.normalizeLine(line)
+          })
 
-          return this.normalizeLine(line)
-        })
-
-        this.normalizedGraphs[index].data = normalizedLines;
+          this.normalizedGraphs[index].data = normalizedLines;
+        }
       }
     },
     createFunctionalLine (line, xMin = X_MIN, xMax = X_MAX) {
-      const dx = 0.1;
+      // Оптимизация (меньшее количество точек в массиве)
+      const dx = (X_MIN < -1000 || X_MAX > 1000) ? 0.1 : 10;
       const xArray = [], yArray = [];
       
       const node = math.parse(line.value);

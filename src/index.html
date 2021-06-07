@@ -45,10 +45,14 @@
               </div>
             </div>
             <div class="section-container__content" v-if="action === 'create'">
-              <create-graph v-on:create="onCreate" />
+              <keep-alive>
+                <create-graph v-on:create="onCreate" />
+              </keep-alive>
             </div>
             <div class="section-container__content" v-else-if="action === 'edit' && graphs.length">
-              <update-graph v-on:update="onUpdate" v-bind:graphs="graphs" v-bind:expand-item="expandItem"/>
+              <keep-alive>
+                <update-graph v-on:update="onUpdate" v-bind:graphs="graphs" v-bind:expand-item="expandItem"/>
+              </keep-alive>
             </div>
           </div>
         </section>
@@ -67,6 +71,7 @@
             <p v-on:click="isVisibleMenu = true;">-&nbsp;<b class="p-link">Создать?</b></p>
           </div>
 
+          
           <div v-else v-for="(graph, index) in normalizedGraphs" :key="index">
             <div class="plotly">
               <div class="plotly__actions">

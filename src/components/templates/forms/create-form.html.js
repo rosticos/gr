@@ -1,6 +1,6 @@
 export default `
     <div class="card card_column">
-      <div>
+      <div class="card__content">
         <p class="p-input__label">Тип графика</p>
         <select v-model="type" class="input-block select-css">
           <option disabled value="">Выберите один из вариантов</option>
@@ -8,10 +8,6 @@ export default `
           <option value="bar">Столбцы</option>
           <option value="pie">Круговая диаграмма</option>
         </select>
-      </div>
-
-      <div class="card__content" v-if="getActiveComponent !== ''">
-        <p class="p-title">Создание графика</p>
       </div>
 
       <component

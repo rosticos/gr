@@ -1,35 +1,34 @@
+
 .card {
   display: flex;
   background: #ffffff;
   border-radius: var(--base-radius);
-  border: 1px solid var(--color-light-grey);
-  padding: var(--base-gap);
-  margin: 16px 0;
 }
 
 .card_column {
   flex-direction: column;
 }
 
-.card_background-light-grey {
+.card__content {
+  padding: 16px;
+  transition: all .3s ease;
+}
+
+.card__content_active {
+  cursor: pointer;
+}
+.card__content_active:hover,
+.card__content_active:active {
   background: var(--color-light-grey-transparent);
 }
 
-.card__content {
-  border-top: 1px solid var(--color-light-grey);
-  margin-top: 16px;
-  padding-top: 16px;
-  margin: 16px -16px 0;
-  padding: 16px 16px 0;
-}
-
 .card__actions {
-  display: flex;
+  background: #fff;
   border-top: 1px solid var(--color-light-grey);
-  margin-top: 16px;
-  padding-top: 16px;
-  margin: 16px -16px 0;
-  padding: 16px 16px 0;
+  display: flex;
+  position: fixed;
+  bottom: 0;
+  width: 500px;
 }
 
 .card > .input-block + .input-block {

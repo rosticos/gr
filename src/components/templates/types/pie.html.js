@@ -1,24 +1,26 @@
 export default `
     <div>
-      <div class="mt-2">
+      <hr>
+      <div class="card__content">
         <p class="p-input__label">Название:</p>
         <input type="text" class="input-block ml-2" v-model="layout.title">
       </div>
+      <hr>
 
-      <div class="card card_column card_background-light-grey" v-for="(pie, index) in pies">
-      
+      <div class="card card_column card__content" v-for="(pie, index) in pies">
         <div class="card">
-          <div class="btn btn_outline ml-2" v-on:click="addItem(index)">
-            Добавить поле
+          <div class="btn btn_outline" v-on:click="addItem(index)">
+            <div class="p-icon p-icon-add"></div>
+            Добавить часть
           </div>
 
           <div class="btn btn_outline ml-auto" v-on:click="removeItem(index)">
-              <div class="p-icon p-icon-close"></div>
-            </div>
+            <div class="p-icon p-icon-close"></div>
+          </div>
         </div>
 
-        <div>
-          <div v-for="counter in pie.counter" :key="counter" class="d-flex mt-4">
+        <div class="mt-4">
+          <div v-for="counter in pie.counter" :key="counter" class="d-flex mt-2">
             <div class="d-flex">
               <p class="p-input__label">Наим:</p>
               <input type="text" class="input-block ml-2" v-model="pie.labels[counter - 1]">
@@ -36,14 +38,14 @@ export default `
         </div>
       </div>
 
-      <div class="card__actions">
+      <div class="card__content card__actions">
         <div class="btn btn_outline" v-on:click="addPie">
           <div class="p-icon p-icon-add"></div>
-          Добавить
+          Добавить график
         </div>
 
-        <div class="btn btn_primary ml-auto" v-on:click="onCreate" v-if="layout.title !== ''">
-          Создать
+        <div class="btn btn_primary ml-auto" v-on:click="submit" v-if="layout.title !== ''">
+          {{ submitText }}
         </div>
       </div>
     </div>
