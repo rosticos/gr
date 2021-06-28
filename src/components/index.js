@@ -538,6 +538,13 @@ new Vue({
             }
             
             this.recount(value, index);
+          } else {
+            const value = {
+              'xaxis.range[0]': layout.xaxis.range[0] || X_MIN,
+              'xaxis.range[1]': layout.xaxis.range[1] || X_MAX,
+            }
+
+            this.recount(value, index, 'scatter');
           }
         }
 
@@ -618,6 +625,13 @@ new Vue({
             }
             
             this.recount(value, this.graphs.length - 1);
+          } else {
+            const value = {
+              'xaxis.range[0]': layout.xaxis.range[0],
+              'xaxis.range[1]': layout.xaxis.range[1],
+            }
+
+            this.recount(value, this.graphs.length - 1, 'scatter');
           }
         }
   
@@ -669,7 +683,30 @@ new Vue({
     },
     createFunctionalLine (line, xMin = X_MIN, xMax = X_MAX) {
       // Оптимизация (меньшее количество точек в массиве)
-      const dx = (X_MIN < -1000 || X_MAX > 1000) ? 0.1 : 10;
+      let dx = 0.1
+
+      switch (true) {
+        case (Math.abs(xMin - xMax)) >= 1000 && (Math.abs(xMin - xMax)) < 10000:
+          dx = 0.5
+          break;
+        case (Math.abs(xMin - xMax)) >= 10000 && (Math.abs(xMin - xMax)) < 100000:
+          dx = 10
+          break;
+        case (Math.abs(xMin - xMax)) >= 100000 && (Math.abs(xMin - xMax)) < 1000000:
+          dx = 100
+          break;
+        case (Math.abs(xMin - xMax)) >= 1000000 && (Math.abs(xMin - xMax)) < 10000000:
+          dx = 1000
+          break;
+        case (Math.abs(xMin - xMax)) >= 10000000 && (Math.abs(xMin - xMax)) < 100000000:
+          dx = 10000
+          break;
+        case (Math.abs(xMin - xMax)) >= 100000000:
+          dx = 10000000
+          break;
+        default:
+          dx = 0.1
+      }
       const xArray = [], yArray = [];
       
       const node = math.parse(line.value);
