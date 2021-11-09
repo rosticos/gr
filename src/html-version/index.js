@@ -1,11 +1,11 @@
-const X_MIN = -30
-const X_MAX = 30
-
 import { default as Scatter } from './templates/types/scatter.html.js'
 import { default as Bar } from './templates/types/bar.html.js'
 import { default as Pie } from './templates/types/pie.html.js'
 import { default as CreateForm } from './templates/forms/create-form.html.js'
 import { default as UpdateForm } from './templates/forms/update-form.html.js'
+
+const X_MIN = -30
+const X_MAX = 30
 
 Vue.component('create-graph', {
   template: CreateForm,
@@ -21,21 +21,21 @@ Vue.component('create-graph', {
       switch (this.type) {
         case 'scatter':
           component = 'create-scatter'
-          break;
-        
+          break
+
         case 'bar':
           component = 'create-bar'
-          break;
+          break
 
         case 'pie':
           component = 'create-pie'
-          break;
-        
+          break
+
         default:
-          break;
+          break
       }
 
-      return component;
+      return component
     }
   },
   methods: {
@@ -44,7 +44,7 @@ Vue.component('create-graph', {
       this.type = ''
     },
     addLine () {
-      // 
+      //
     }
   }
 })
@@ -69,7 +69,7 @@ Vue.component('update-graph', {
       immediate: true,
       handler (value) {
         if (value != null) {
-          this.setExpand(value, true);
+          this.setExpand(value, true)
         }
       }
     }
@@ -91,33 +91,33 @@ Vue.component('update-graph', {
       switch (type) {
         case 'scatter':
           component = 'update-scatter'
-          break;
-        
+          break
+
         case 'bar':
           component = 'update-bar'
-          break;
+          break
 
         case 'pie':
           component = 'update-pie'
-          break;
-        
+          break
+
         default:
-          break;
+          break
       }
 
-      return component;
+      return component
     },
     onUpdate ({ values, layout }, type, index) {
-      this.$emit('update', { values, layout, type, index})
+      this.$emit('update', { values, layout, type, index })
     },
     addLine () {
-      // 
+      //
     }
   }
 })
 
 const createScatter = Vue.component('create-scatter', {
-  template: Scatter, 
+  template: Scatter,
   data: () => {
     return {
       submitText: 'Создать',
@@ -125,15 +125,15 @@ const createScatter = Vue.component('create-scatter', {
         title: 'График',
         xaxis: {
           title: 'X',
-          range: [ -30, 30 ]
+          range: [-30, 30]
         },
         yaxis: {
           title: 'Y',
-          range: [ -30, 30 ]
-        },
+          range: [-30, 30]
+        }
       },
       lines: [
-        { 
+        {
           name: 'y=f*x',
           funcRelative: 'x',
           declareType: 'byFunction',
@@ -143,7 +143,7 @@ const createScatter = Vue.component('create-scatter', {
           constsArray: [{
             name: 'f',
             value: 1
-          }],
+          }]
         }
       ]
     }
@@ -161,13 +161,13 @@ const createScatter = Vue.component('create-scatter', {
     getParamsValues (str) {
       return this.str.split(/,/)
     },
-    addPoint(index) {
+    addPoint (index) {
       this.lines[index].value.push({
         x: '',
         y: ''
       })
     },
-    removePoint(index, rmIndex) {
+    removePoint (index, rmIndex) {
       this.lines[index].value.splice(rmIndex, 1)
     },
     onChangeDeclareType (index) {
@@ -179,7 +179,6 @@ const createScatter = Vue.component('create-scatter', {
           y: ''
         }]
       }
-
     },
     add () {
       this.$emit('add', this.graph)
@@ -214,7 +213,7 @@ const createBar = Vue.component('create-bar', {
           counter: 1,
           type: 'bar',
           name: '',
-          values: [],
+          values: []
         }
       ]
     }
@@ -226,25 +225,25 @@ const createBar = Vue.component('create-bar', {
           counter: 1,
           type: 'bar',
           name: '',
-          values: [],
+          values: []
         }
       ]
     },
     removeBarTitle (index) {
       this.titles.splice(index, 1)
       this.bars.forEach(bar => {
-        bar.values.splice(index, 1);
-        bar.counter -= 1;
+        bar.values.splice(index, 1)
+        bar.counter -= 1
       })
     },
     removeBar (index) {
-      this.bars.splice(index, 1);
+      this.bars.splice(index, 1)
     },
     addItem () {
       this.titles.push('')
       this.bars.forEach(bar => {
-        bar.values = [...bar.values, 0];
-        bar.counter += 1;
+        bar.values = [...bar.values, 0]
+        bar.counter += 1
       })
     },
     addBar () {
@@ -252,7 +251,7 @@ const createBar = Vue.component('create-bar', {
         counter: this.titles.length,
         type: 'bar',
         name: '',
-        values: Array(this.titles.length).fill(0),
+        values: Array(this.titles.length).fill(0)
       })
     },
     submit () {
@@ -276,10 +275,10 @@ const createPie = Vue.component('create-pie', {
         {
           counter: 3,
           type: 'pie',
-          textinfo: "label+percent",
+          textinfo: 'label+percent',
           values: [],
           labels: [],
-          insidetextorientation: "radial"
+          insidetextorientation: 'radial'
         }
       ]
     }
@@ -290,31 +289,31 @@ const createPie = Vue.component('create-pie', {
         {
           counter: 3,
           type: 'pie',
-          textinfo: "label+percent",
+          textinfo: 'label+percent',
           values: [],
           labels: [],
-          insidetextorientation: "radial"
+          insidetextorientation: 'radial'
         }
       ]
     },
     removePieItem (index, pieIndex) {
-      this.pies[index].counter -= 1;
-      this.pies[index].values.splice(pieIndex, 1);
-      this.pies[index].labels.splice(pieIndex, 1);
+      this.pies[index].counter -= 1
+      this.pies[index].values.splice(pieIndex, 1)
+      this.pies[index].labels.splice(pieIndex, 1)
     },
     addItem (index) {
-      this.pies[index].counter += 1;
-      this.pies[index].values.push('');
-      this.pies[index].labels.push('');
+      this.pies[index].counter += 1
+      this.pies[index].values.push('')
+      this.pies[index].labels.push('')
     },
     addPie () {
       this.pies.push({
         counter: 1,
         type: 'pie',
-        textinfo: "label+percent",
+        textinfo: 'label+percent',
         values: [0],
         labels: [''],
-        insidetextorientation: "radial"
+        insidetextorientation: 'radial'
       })
     },
     removeItem (index) {
@@ -336,7 +335,7 @@ Vue.component('update-scatter', {
   },
   data: () => {
     return {
-      submitText: 'Обновить',
+      submitText: 'Обновить'
     }
   },
   methods: {
@@ -345,8 +344,8 @@ Vue.component('update-scatter', {
     }
   },
   mounted () {
-    this.lines = this.graph.values;
-    this.layout = this.graph.layout;
+    this.lines = this.graph.values
+    this.layout = this.graph.layout
   }
 })
 
@@ -355,7 +354,7 @@ Vue.component('update-bar', {
   extends: createBar,
   data: () => {
     return {
-      submitText: 'Обновить',
+      submitText: 'Обновить'
     }
   },
   props: {
@@ -368,9 +367,9 @@ Vue.component('update-bar', {
     }
   },
   mounted () {
-    this.titles = this.graph.values[0].titles;
-    this.bars = this.graph.values;
-    this.layout = this.graph.layout;
+    this.titles = this.graph.values[0].titles
+    this.bars = this.graph.values
+    this.layout = this.graph.layout
   }
 })
 
@@ -379,7 +378,7 @@ Vue.component('update-pie', {
   extends: createPie,
   data: () => {
     return {
-      submitText: 'Обновить',
+      submitText: 'Обновить'
     }
   },
   props: {
@@ -391,8 +390,8 @@ Vue.component('update-pie', {
     }
   },
   mounted () {
-    this.pies = this.graph.values;
-    this.layout = this.graph.layout;
+    this.pies = this.graph.values
+    this.layout = this.graph.layout
   }
 })
 
@@ -408,39 +407,39 @@ new Vue({
       normalizedGraphs: [],
       // Массив графиков для восстановления
       graphs: [{
-        "values": [{
-          "name": "y=f*x",
-          "funcRelative": "x",
-          "declareType": "byFunction",
-          "type": "scatter",
-          "mode": "lines",
-          "value": "y=f*x",
-          "constsArray": [{
-            "name": "f",
-            "value": 1
+        values: [{
+          name: 'y=f*x',
+          funcRelative: 'x',
+          declareType: 'byFunction',
+          type: 'scatter',
+          mode: 'lines',
+          value: 'y=f*x',
+          constsArray: [{
+            name: 'f',
+            value: 1
           }]
         }],
-        "layout": {
-          "title": "График",
-          "xaxis": {
-            "title": "X",
-            "range": [-30, 30]
+        layout: {
+          title: 'График',
+          xaxis: {
+            title: 'X',
+            range: [-30, 30]
           },
-          "yaxis": {
-            "title": "Y",
-            "range": [-30, 30]
+          yaxis: {
+            title: 'Y',
+            range: [-30, 30]
           }
         },
-        "type": "scatter"
+        type: 'scatter'
       }]
     }
   },
   created () {
     this.graphs.map(graph => {
-      this.onCreate({ 
-        values: graph.values, 
-        layout: graph.layout, 
-        type: graph.values[0].type 
+      this.onCreate({
+        values: graph.values,
+        layout: graph.layout,
+        type: graph.values[0].type
       }, true)
     })
   },
@@ -482,7 +481,7 @@ new Vue({
           type: line.type,
           mode: line.mode,
           x: line.value.map(item => item.x),
-          y: line.value.map(item => item.y),
+          y: line.value.map(item => item.y)
         }
       } else if (line.declareType === 'byFunction') {
         const { x, y } = this.createFunctionalLine(line, xMin, xMax)
@@ -492,15 +491,15 @@ new Vue({
           type: line.type,
           mode: line.mode,
           x,
-          y,
+          y
         }
       }
     },
     getTex (value) {
-      let html = MathJax.tex2svg(value);
+      const html = MathJax.tex2svg(value)
       return html.outerHTML
     },
-    onUpdate ({values, layout, type, index}) {
+    onUpdate ({ values, layout, type, index }) {
       this.error = null
       try {
         if (type === 'scatter') {
@@ -519,7 +518,7 @@ new Vue({
                   data: normalizedLines
                 }
               }
-    
+
               return graph
             })
           }
@@ -528,23 +527,23 @@ new Vue({
             const xArray = values.map(item => {
               if (item.declareType === 'byCoords') {
                 return item.value.map(item => item.x)
-              } 
-              return [];
-            }).flat();
-            
+              }
+              return []
+            }).flat()
+
             const value = {
               'xaxis.range[0]': Math.min(...xArray),
-              'xaxis.range[1]': Math.max(...xArray),
+              'xaxis.range[1]': Math.max(...xArray)
             }
-            
-            this.recount(value, index);
+
+            this.recount(value, index)
           } else {
             const value = {
               'xaxis.range[0]': layout.xaxis.range[0] || X_MIN,
-              'xaxis.range[1]': layout.xaxis.range[1] || X_MAX,
+              'xaxis.range[1]': layout.xaxis.range[1] || X_MAX
             }
 
-            this.recount(value, index, 'scatter');
+            this.recount(value, index, 'scatter')
           }
         }
 
@@ -592,52 +591,52 @@ new Vue({
           return graph
         })
       } catch (error) {
-        this.error = error;
+        this.error = error
       }
     },
-    onCreate ({values, layout, type }, isMountEvent = false) {
+    onCreate ({ values, layout, type }, isMountEvent = false) {
       this.error = null
 
       if (!isMountEvent) {
         this.graphs.push({ values, layout, type })
       }
-      
+
       try {
         if (type === 'scatter') {
           const normalizedLines = values.map(line => this.normalizeLine(line))
-  
+
           this.normalizedGraphs.push({
             layout: JSON.parse(JSON.stringify(layout)),
             data: normalizedLines
           })
-  
+
           if (values.some(value => value.declareType === 'byCoords')) {
             const xArray = values.map(item => {
               if (item.declareType === 'byCoords') {
                 return item.value.map(item => item.x)
-              } 
-              return [];
-            }).flat();
-            
+              }
+              return []
+            }).flat()
+
             const value = {
               'xaxis.range[0]': Math.min(...xArray),
-              'xaxis.range[1]': Math.max(...xArray),
+              'xaxis.range[1]': Math.max(...xArray)
             }
-            
-            this.recount(value, this.graphs.length - 1);
+
+            this.recount(value, this.graphs.length - 1)
           } else {
             const value = {
               'xaxis.range[0]': layout.xaxis.range[0],
-              'xaxis.range[1]': layout.xaxis.range[1],
+              'xaxis.range[1]': layout.xaxis.range[1]
             }
 
-            this.recount(value, this.graphs.length - 1, 'scatter');
+            this.recount(value, this.graphs.length - 1, 'scatter')
           }
         }
-  
+
         if (type === 'pie') {
           const normalizedPies = values.map((pie, index) => this.normalizePie(pie, index / 2, index % 2))
-  
+
           this.normalizedGraphs.push({
             layout: {
               ...layout,
@@ -646,7 +645,7 @@ new Vue({
             data: normalizedPies
           })
         }
-  
+
         if (type === 'bar') {
           const normalizedBars = values.map(bar => this.normalizeBar(bar))
           this.normalizedGraphs.push({
@@ -658,18 +657,17 @@ new Vue({
           })
         }
       } catch (error) {
-        this.error = error;
+        this.error = error
       }
     },
     recount (value, index, type) {
       if (type === 'scatter') {
-        const lines = this.graphs[index].values;
-        
+        const lines = this.graphs[index].values
+
         if (value?.['xaxis.range[0]'] && value?.['xaxis.range[1]']) {
           const normalizedLines = lines.map(line => {
             if (line.declareType === 'byFunction' && (value?.['xaxis.range[0]'] < X_MIN || value?.['xaxis.range[1]'] > X_MAX)) {
-            
-              const [ xMin, xMax ] = [value['xaxis.range[0]'], value['xaxis.range[1]']]
+              const [xMin, xMax] = [value['xaxis.range[0]'], value['xaxis.range[1]']]
 
               return this.normalizeLine(line, xMin, xMax)
             }
@@ -677,7 +675,7 @@ new Vue({
             return this.normalizeLine(line)
           })
 
-          this.normalizedGraphs[index].data = normalizedLines;
+          this.normalizedGraphs[index].data = normalizedLines
         }
       }
     },
@@ -688,47 +686,47 @@ new Vue({
       switch (true) {
         case (Math.abs(xMin - xMax)) >= 1000 && (Math.abs(xMin - xMax)) < 10000:
           dx = 0.5
-          break;
+          break
         case (Math.abs(xMin - xMax)) >= 10000 && (Math.abs(xMin - xMax)) < 100000:
           dx = 10
-          break;
+          break
         case (Math.abs(xMin - xMax)) >= 100000 && (Math.abs(xMin - xMax)) < 1000000:
           dx = 100
-          break;
+          break
         case (Math.abs(xMin - xMax)) >= 1000000 && (Math.abs(xMin - xMax)) < 10000000:
           dx = 1000
-          break;
+          break
         case (Math.abs(xMin - xMax)) >= 10000000 && (Math.abs(xMin - xMax)) < 100000000:
           dx = 10000
-          break;
+          break
         case (Math.abs(xMin - xMax)) >= 100000000:
           dx = 10000000
-          break;
+          break
         default:
           dx = 0.1
       }
-      const xArray = [], yArray = [];
-      
-      const node = math.parse(line.value);
-      const scope = new Map();
-      
+      const xArray = []; const yArray = []
+
+      const node = math.parse(line.value)
+      const scope = new Map()
+
       if (line.constsArray.length) {
         line.constsArray.forEach(cons => {
           scope.set(cons.name, math.evaluate(cons.value))
         })
       }
-      
-      for (let x = xMin; x < xMax; x += dx ) {
-        const code = node.compile();
-        
-        xArray.push(x);
-        yArray.push(code.evaluate({ [line.funcRelative]:x, ...Object.fromEntries(scope) }));
+
+      for (let x = xMin; x < xMax; x += dx) {
+        const code = node.compile()
+
+        xArray.push(x)
+        yArray.push(code.evaluate({ [line.funcRelative]: x, ...Object.fromEntries(scope) }))
       }
-      
+
       return {
         x: xArray,
-        y: yArray,
-      };
+        y: yArray
+      }
     }
   }
 })

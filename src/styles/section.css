@@ -1,9 +1,10 @@
 .section-container {
   height: 100vh; 
+  border-left: 1px solid var(--color-light-grey); 
   position: fixed; 
   width: 500px; 
   right: 0; 
-  border-left: 1px solid var(--color-light-grey); 
+  top: 0;
   background: white;
   z-index: 101;
   transition: all .3s ease;
@@ -15,15 +16,12 @@
 
 .section-container__block {
   position: relative;
-  overflow-y: scroll;
   overflow-x: hidden;
   height: 100%;
 }
 
 .section-container__actions {
-  position: fixed;
   z-index: 100;
-  top: 0;
   display: flex;
   width: 500px;
   border-bottom: 1px solid var(--color-light-grey); 
@@ -32,8 +30,7 @@
 
 .section-container__content {
   position: relative;
-  margin-top: 60px;
-  margin-bottom: 71px;
+  margin-bottom: 41px;
 }
 
 .section__btn {
@@ -62,7 +59,7 @@
 }
 
 .section__btn_close_rotate {
-  transform: rotate(90deg);
+  transform: rotate(180deg);
 }
 
 .section__btn_close:hover, 
