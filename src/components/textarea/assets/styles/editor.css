@@ -13,40 +13,41 @@
   margin: 0 !important;
   max-width: unset !important;
 }
-.tox-editor-header .tox-toolbar__primary {
+.tox-tinymce-inline .tox-editor-header .tox-toolbar__primary {
   background: none !important;
 }
 .tox:not([dir=rtl]) .tox-toolbar__group:not(:last-of-type) {
-  border-color: var(--color-link-water) !important;
+  border-color: var(--color-light-grey) !important;
 }
 .tox:not([dir=rtl]) .tox-toolbar__group:first-of-type {
-  border-left: 1px solid var(--color-link-water) !important;
+  border-left: 1px solid var(--color-light-grey) !important;
 }
 .tox .editor-icon {
   fill: none !important;
 }
 .tox .tox-tbtn {
   border-radius: 6px !important;
-  color: var(--color-primary-text) !important;
+  color: var(--color-deep-blue) !important;
   height: 32px !important;
   margin: 0 !important;
   width: 32px !important;
+  cursor: pointer;
 }
 .tox .tox-tbtn--select {
   padding: 0 12px !important;
   width: auto !important;
 }
 .tox .tox-tbtn svg {
-  fill: var(--color-primary-text);
+  fill: var(--color-deep-blue);
 }
 .tox .tox-tbtn:hover {
   background: var(--color-white-smoke) !important;
 }
 .tox .tox-tbtn--enabled, .tox .tox-tbtn--enabled:hover {
-  background: var(--color-link-water) !important;
+  background: var(--color-light-grey) !important;
 }
 .tox .tox-tbtn--disabled {
-  color: var(--color-grey-heather) !important;
+  color: var(--color-light-grey) !important;
 }
 .tox-toolbar__group {
   display: grid;

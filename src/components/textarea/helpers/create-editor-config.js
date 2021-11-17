@@ -1,30 +1,40 @@
 export default function createEditorConfig(componentContext) {
-  console.log('%ccreate-editor-config.js line:2 componentContext', 'color: #007acc;', componentContext);
   return {
-    selector: '#kek',
+    base_url: '/tinymce',
+    selector: `#${componentContext.editorId}`,
+    height: 500,
     icons_url: '/tinymce/icons/editor-icons/index.js',
     icons: 'editor-icons',
     inline: true,
-    language: 'ru',
-    menubar: false,
+    placeholder: 'Ask a question or post an update...',
     contextmenu: false,
-    plugins: 'lists table link image quickbars paste',
-    quickbars_insert_toolbar: false,
-    quickbars_selection_toolbar: 'bold italic underline',
+    menubar: false,
+    language: 'ru',
     table_resize_bars: false,
     keep_styles: false,
-    invalid_styles: 'background background-color color font-family font-size',
+    automatic_uploads: true,
+    quickbars_insert_toolbar: false,
+    content_style: 'img {max-width: 100%;}',
+    paste_data_images: true,
     fixed_toolbar_container: '.constructor-header-toolbar__tinymce-toolbar',
-    toolbar: [
-      { name: 'history', items: ['undo', 'redo'] },
-      { name: 'formatting', items: ['bold', 'italic', 'underline'] },
-      { name: 'formats', items: ['button-format-p', 'button-format-h3'] },
-      { name: 'alignment', items: ['alignleft', 'aligncenter', 'alignright', 'alignjustify'] },
-      { name: 'lists', items: ['numlist', 'bullist'] },
-      { name: 'table', items: ['table'] },
-      { name: 'links', items: ['link', 'openlink', 'unlink'] },
-      { name: 'images', items: ['image', 'quickimage'] },
-      { name: 'indentation', items: ['removeformat', 'outdent', 'indent'] }
-    ]
+    quickbars_selection_toolbar: 'bold italic underline',
+    plugins: 'code link lists table tiny_mce_wiris image imagetools',
+    toolbar: 'undo redo | formatselect | ' +
+      ' bold italic backcolor | alignleft aligncenter ' +
+      ' alignright alignjustify | bullist numlist outdent indent |' +
+      ' removeformat | tiny_mce_wiris_formulaEditor | image',
+    init_instance_callback: (editor) => {
+      editor.setContent(componentContext.syncValue);
+    },
+    setup: (editor) => {
+      editor.on('input', () => {
+        componentContext.onEditorInput();
+
+        componentContext.updateTemplate();
+
+        // editorScrollIntoView(editor);
+      });
+    }
+
   };
 }

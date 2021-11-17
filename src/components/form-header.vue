@@ -4,9 +4,19 @@
       График
     </div>
 
-    <div class="nav__btn" v-on:click="create('text')">
+    <div class="nav__btn" v-on:click="create('textarea')">
       Текст
     </div>
+
+    <div class="nav__btn" v-on:click="$emit('download')">
+      Сохранить
+    </div>
+
+    <div class="nav__btn" v-on:click="$refs.jsonImporter.click()">
+      Импорт
+    </div>
+
+    <input ref="jsonImporter" type="file" style="display: none;" enctype="multipart/form-data" v-on:change="readFile($event)">
   </nav>
 </template>
 
@@ -16,6 +26,17 @@
     methods: {
       create(type) {
         this.$emit(`create-${type}`);
+      },
+      readFile(event) {
+        const files = event.target.files;
+        const file = files[0];           
+        const reader = new FileReader();
+
+        reader.onload = (event) => {
+          this.$emit('import', JSON.parse(event.target.result));
+        };
+
+        reader.readAsText(file);
       }
     }
   };
@@ -23,25 +44,21 @@
 
 <style>
   .nav {
-    border-bottom: 1px solid var(--color-light-grey);
     display: flex;
-    margin-bottom: 24px;
   }
 
   .nav__btn {
-    padding: 20px;
-    transition: all .3s ease;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    transition: background .3s ease;
     cursor: pointer;
-    text-align: center;
   }
 
   .nav__btn + .nav__btn {
     border-left: 1px solid var(--color-light-grey);
   }
 
-  .nav__btn:last-of-type {
-    border-right: 1px solid var(--color-light-grey);
-  }
 
   .nav__btn_close:hover,
   .nav__btn_close:active {
@@ -49,7 +66,7 @@
   }
 
   .nav__btn:hover {
-    background: var(--color-grey);
+    background: var(--color-white-smoke);
   }
 
   .nav__btn_active {

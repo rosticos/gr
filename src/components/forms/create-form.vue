@@ -61,6 +61,7 @@
     methods: {
       onCreate({ values, layout }) {
         this.$emit('create', { values, layout, type: this.type });
+        
         this.type = '';
       },
       addLine() {

@@ -5,7 +5,7 @@
     name: 'TypesUpdateScatter',
     extends: Scatter,
     props: {
-      graph: Object
+      graph: { type: Object, default: () => ({}) }
     },
     data: () => {
       return {

@@ -34,8 +34,6 @@ a {
   text-decoration: none;
 }
 p {
-  display: flex;
-  align-self: center;
   padding: 0;
   margin: 0;
 }
@@ -74,13 +72,12 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 .container {
-  padding: 0 15px;
 }
 
 @media (min-width: 575.98px){
   .container {
     max-width: 540px;
-    margin: auto;
+    min-width: 540px;
     padding: 0;
   }
 }
@@ -88,18 +85,21 @@ input[type=number]::-webkit-outer-spin-button {
 @media (min-width: 767.98px){
   .container {
     max-width: 720px;	
+    min-width: 720px;
   }
 }
 
 @media (min-width: 991.98px) {
   .container {
     max-width: 960px;
+    min-width: 960px
   }
 }
 
 @media (min-width: 1199.98px){
   .container {
     max-width: 1140px;
+    min-width: 1140px
   }
 }
 

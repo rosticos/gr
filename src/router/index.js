@@ -1,21 +1,15 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 
-import Editor from '../views/Editor.vue';
-import Textarea from '../views/textarea.vue';
+import EditorPage from '../views/editor-page.vue';
 
 Vue.use(VueRouter);
 
 const routes = [
   {
     path: '/',
-    name: 'Home',
-    component: Editor
-  },
-  {
-    path: '/text',
-    name: 'Textarea',
-    component: Textarea
+    name: 'EditorPage',
+    component: EditorPage
   }
 ];
 

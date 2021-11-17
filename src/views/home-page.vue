@@ -1,18 +1,19 @@
 <template>
   <div>
-    <form-header v-on:create-graph="showCreateGraph" v-on:create-text="showCreateText" />
+    <form-header />
 
+    <!-- {{ viewTree[viewTree.length - 1] }} -->
     <div class="container">
       <div v-for="(item, index) in viewTree" v-bind:key="`tree-${index}`">
         <div v-if="item.type === 'graph'">
-          <div v-for="(graph, index) in item.normalizedValue" v-bind:key="graph.id">
+          <div v-for="(graph, index) in item.normalizedValue" v-bind:key="`graph-${index}`">
             <div class="plotly">
               <div class="plotly__actions">
-                <div class="btn btn_outline ml-2" v-on:click="removeGraph(item.id)">
+                <div class="btn btn_outline ml-2" v-on:click="removeGraph(index)">
                   <div class="p-icon p-icon-close" />
                 </div>
 
-                <div class="btn btn_outline ml-2" v-on:click="editGraph(item)">
+                <div class="btn btn_outline ml-2" v-on:click="editGraph(graph)">
                   <div class="p-icon p-icon-edit" />
                 </div>
               </div>
@@ -29,7 +30,7 @@
         </div>
 
         <div v-if="item.type === 'text'">
-          <textarea-editor v-bind:value.sync="item.value" />
+          {{ item.value }}
         </div>
       </div>
     </div>
@@ -49,31 +50,67 @@
               Редактирование
             </div>
           </div>
-          <!-- <div class="section-container__content" v-if="action === 'create'">
+          <div v-if="action === 'create'" class="section-container__content">
             <keep-alive>
-              <create-form v-on:create="onCreate" />
+              <create-form v-on:create="onCreateGraph" />
             </keep-alive>
-          </div> -->
-          <div v-if="action === 'edit'" class="section-container__content">
+          </div>
+          <div v-else-if="action === 'edit' && graphs.length" class="section-container__content">
             <keep-alive>
               <update-form v-bind:graphs="graphs" v-bind:expand-item="expandItem" v-on:update="onUpdate" />
             </keep-alive>
           </div>
         </div>
       </section>
+
+      <!-- <div class="container">
+        <div v-if="error" style="padding-top: 100px;">
+          <p>- Ой, что-то пошло не так...</p>
+          <p>- А что делать?</p>
+          <p>- Зайди в раздел "Редактирование" и поправь параметры, указанные в ошибке</p>
+          <p class="p-error mt-2 mb-2">{{ error }}</p>
+          <p v-on:click="isVisibleMenu = true; action = 'edit';">-&nbsp;<b class="p-link">Редактировать?</b></p>
+        </div>
+
+        <div v-if="normalizedGraphs.length === 0 && !error" style="padding-top: 100px;">
+          <p>- Пока нет графиков на полотне...</p>
+          <p v-on:click="isVisibleMenu = true;">-&nbsp;<b class="p-link">Создать?</b></p>
+        </div>
+
+        <div v-else v-for="(graph, index) in normalizedGraphs" :key="index">
+          <div class="plotly">
+            <div class="plotly__actions">
+              <div class="btn btn_outline ml-2" v-on:click="removeGraph(index)">
+                <div class="p-icon p-icon-close"></div>
+              </div>
+
+              <div class="btn btn_outline ml-2" v-on:click="setEditMode(index)">
+                <div class="p-icon p-icon-edit"></div>
+              </div>
+            </div>
+
+            <plotly
+              v-bind:data="graph.data"
+              v-bind:layout="graph.layout"
+              v-bind:display-mode-bar="true"
+              v-on:relayout="recount($event, index, graph.data[0].type)"
+              v-bind:scroll-zoom="true"
+              v-bind:mode-bar-buttons-to-remove="['lasso2d','zoom2d','resetScale2d','toggleSpikelines','producedWithPlotly']"
+            ></plotly>
+          </div>
+        </div>
+      </div> -->
     </div>
   </div>
 </template>
 
 <script>
   import FormHeader from '../components/form-header.vue';
-  // import CreateForm from '../components/forms/create-form.vue'
+  import CreateForm from '../components/forms/create-form.vue';
   import UpdateForm from '../components/forms/update-form.vue';
   import Plotly from '../components/plotly/plotly';
-  import TextareaEditor from '../components/textarea/textarea-editor.vue';
 
   import { parse, evaluate } from 'mathjs';
-  import { v4 as uuid } from 'uuid';
   // import MathJax from 'mathjax'
 
   const X_MIN = -30;
@@ -83,10 +120,9 @@
     name: 'Home',
     components: {
       FormHeader,
-      // CreateForm,
+      CreateForm,
       UpdateForm,
-      Plotly,
-      TextareaEditor
+      Plotly
     },
     data: () => {
       return {
@@ -96,7 +132,6 @@
         isVisibleMenu: false,
         viewTree: [
           {
-            id: uuid(),
             type: 'graph',
             value: [{
               values: [{
@@ -127,18 +162,76 @@
             normalizedValue: []
           },
           {
-            id: uuid(),
             type: 'text',
             value: 'text'
+          },
+          {
+            type: 'graph',
+            value: [{
+              values: [{
+                name: 'y=f*x',
+                funcRelative: 'x',
+                declareType: 'byFunction',
+                type: 'scatter',
+                mode: 'lines',
+                value: 'y=f*x',
+                constsArray: [{
+                  name: 'f',
+                  value: 1
+                }]
+              }],
+              layout: {
+                title: 'График',
+                xaxis: {
+                  title: 'X',
+                  range: [-30, 30]
+                },
+                yaxis: {
+                  title: 'Y',
+                  range: [-30, 30]
+                }
+              },
+              type: 'scatter'
+            }],
+            normalizedValue: []
           }
-        ]
+        ],
+        // Массив графиков для отрисовки
+        normalizedGraphs: [],
+        // Массив графиков для восстановления
+        graphs: [{
+          values: [{
+            name: 'y=f*x',
+            funcRelative: 'x',
+            declareType: 'byFunction',
+            type: 'scatter',
+            mode: 'lines',
+            value: 'y=f*x',
+            constsArray: [{
+              name: 'f',
+              value: 1
+            }]
+          }],
+          layout: {
+            title: 'График',
+            xaxis: {
+              title: 'X',
+              range: [-30, 30]
+            },
+            yaxis: {
+              title: 'Y',
+              range: [-30, 30]
+            }
+          },
+          type: 'scatter'
+        }]
       };
     },
     created() {
       this.viewTree.map((item, index) => {
         if (item.type === 'graph') {
           item.value.map(graph => {
-            this.onCreate({
+            this.onCreateGraph({
               index,
               values: graph.values,
               layout: graph.layout,
@@ -151,13 +244,17 @@
           //
         }
       });
+
+      this.graphs.map(graph => {
+        this.onCreate({
+          values: graph.values,
+          layout: graph.layout,
+          type: graph.values[0].type
+        }, true);
+      });
     },
     methods: {
-      showCreateForm() {
-
-      },
       editGraph(item) {
-        console.log('🚀 ~ file: Editor.vue ~ line 161 ~ editGraph ~ item', item);
         this.isVisibleMenu = true;
         this.action = 'edit';
 
@@ -208,6 +305,10 @@
           };
         }
       },
+      // getTex (value) {
+      //   const html = MathJax.tex2svg(value)
+      //   return html.outerHTML
+      // },
       onUpdate({ values, layout, type, index }) {
         this.error = null;
         try {
@@ -303,15 +404,80 @@
           this.error = error;
         }
       },
-      onCreate({ index, values, layout, type }, isMountEvent = false) {
+      onCreate({ values, layout, type }, isMountEvent = false) {
         this.error = null;
 
+        if (!isMountEvent) {
+          this.graphs.push({ values, layout, type });
+        }
+
+        try {
+          if (type === 'scatter') {
+            const normalizedLines = values.map(line => this.normalizeLine(line));
+
+            this.normalizedGraphs.push({
+              layout: JSON.parse(JSON.stringify(layout)),
+              data: normalizedLines
+            });
+
+            if (values.some(value => value.declareType === 'byCoords')) {
+              const xArray = values.map(item => {
+                if (item.declareType === 'byCoords') {
+                  return item.value.map(item => item.x);
+                }
+                return [];
+              }).flat();
+
+              const value = {
+                'xaxis.range[0]': Math.min(...xArray),
+                'xaxis.range[1]': Math.max(...xArray)
+              };
+
+              this.recount(value, this.graphs.length - 1);
+            } else {
+              const value = {
+                'xaxis.range[0]': layout.xaxis.range[0],
+                'xaxis.range[1]': layout.xaxis.range[1]
+              };
+
+              this.recount(value, this.graphs.length - 1, 'scatter');
+            }
+          }
+
+          if (type === 'pie') {
+            const normalizedPies = values.map((pie, index) => this.normalizePie(pie, index / 2, index % 2));
+
+            this.normalizedGraphs.push({
+              layout: {
+                ...layout,
+                grid: { rows: Math.ceil(normalizedPies.length / 2), columns: normalizedPies.length === 1 ? 1 : 2 }
+              },
+              data: normalizedPies
+            });
+          }
+
+          if (type === 'bar') {
+            const normalizedBars = values.map(bar => this.normalizeBar(bar));
+            this.normalizedGraphs.push({
+              layout: {
+                ...layout,
+                barmode: 'group'
+              },
+              data: normalizedBars
+            });
+          }
+        } catch (error) {
+          this.error = error;
+        }
+      },
+      onCreateGraph({ index, values, layout, type }, isMountEvent = false) {
+        this.error = null;
         if (index == null) {
           index = this.viewTree.length - 1;
         }
 
         if (!isMountEvent) {
-          this.viewTree.push({ id: uuid(), type: 'graph', value: [{ values, layout, type }], normalizedValue: [] });
+          this.viewTree.push({ type: 'graph', value: [{ values, layout, type }], normalizedValue: [] });
         }
 
         try {
