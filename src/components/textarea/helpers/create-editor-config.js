@@ -1,10 +1,9 @@
-export default function createEditorConfig (componentContext) {
+export default function createEditorConfig(componentContext) {
+  console.log('%ccreate-editor-config.js line:2 componentContext', 'color: #007acc;', componentContext);
   return {
     selector: '#kek',
     icons_url: '/tinymce/icons/editor-icons/index.js',
     icons: 'editor-icons',
-    extended_valid_elements: 'span[class|contenteditable|id|data-textarea-element-input]',
-    invalid_elements: 'div,pre',
     inline: true,
     language: 'ru',
     menubar: false,
@@ -27,5 +26,5 @@ export default function createEditorConfig (componentContext) {
       { name: 'images', items: ['image', 'quickimage'] },
       { name: 'indentation', items: ['removeformat', 'outdent', 'indent'] }
     ]
-  }
+  };
 }

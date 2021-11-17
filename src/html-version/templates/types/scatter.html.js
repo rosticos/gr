@@ -159,4 +159,4 @@ export default `<div>
       {{ submitText }}
     </div>
   </div>
-</div>`
+</div>`;

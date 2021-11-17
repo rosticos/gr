@@ -11,63 +11,61 @@
     </div>
 
     <component
-      v-if="type !== ''"
       v-bind:is="getActiveComponent"
-      v-on:create="onCreate"
-    >
-    </component>
+      v-if="type !== ''"
+      v-on:create="onCreate" />
   </div>
 </template>
 
 <script>
-import CreateScatter from '../types/types-create/scatter.vue'
-import CreatePie from '../types/types-create/pie.vue'
-import CreateBar from '../types/types-create/bar.vue'
+  import CreateScatter from '../types/types-create/scatter.vue';
+  import CreatePie from '../types/types-create/pie.vue';
+  import CreateBar from '../types/types-create/bar.vue';
 
-export default {
-  name: 'CreateForm',
-  components: {
-    CreateScatter,
-    CreatePie,
-    CreateBar
-  },
-  data: function () {
-    return {
-      type: ''
-    }
-  },
-  computed: {
-    getActiveComponent () {
-      let component = ''
-
-      switch (this.type) {
-        case 'scatter':
-          component = 'create-scatter'
-          break
-
-        case 'bar':
-          component = 'create-bar'
-          break
-
-        case 'pie':
-          component = 'create-pie'
-          break
-
-        default:
-          break
-      }
-
-      return component
-    }
-  },
-  methods: {
-    onCreate ({ values, layout }) {
-      this.$emit('create', { values, layout, type: this.type })
-      this.type = ''
+  export default {
+    name: 'CreateForm',
+    components: {
+      CreateScatter,
+      CreatePie,
+      CreateBar
     },
-    addLine () {
+    data: function() {
+      return {
+        type: ''
+      };
+    },
+    computed: {
+      getActiveComponent() {
+        let component = '';
+
+        switch (this.type) {
+          case 'scatter':
+            component = 'create-scatter';
+            break;
+
+          case 'bar':
+            component = 'create-bar';
+            break;
+
+          case 'pie':
+            component = 'create-pie';
+            break;
+
+          default:
+            break;
+        }
+
+        return component;
+      }
+    },
+    methods: {
+      onCreate({ values, layout }) {
+        this.$emit('create', { values, layout, type: this.type });
+        this.type = '';
+      },
+      addLine() {
       //
+      }
     }
-  }
-}
+  };
 </script>

@@ -1,110 +1,110 @@
 <script>
-import TextareaElementInputEditMenuContent from './textarea-element-input-edit-menu-content.vue'
-import { InputModes as InputTypes } from '../consts/input-modes'
-import { TextareaModes as Modes } from '../consts/modes'
+  import TextareaElementInputEditMenuContent from './textarea-element-input-edit-menu-content.vue';
+  import { InputModes as InputTypes } from '../consts/input-modes';
+  import { TextareaModes as Modes } from '../consts/modes';
 
-export default {
-  name: 'TextareaElementInput',
-  components: {
-    EditMenuContent: TextareaElementInputEditMenuContent
-  },
-  props: {
-    id: { required: true, type: String },
-    mode: { required: true, type: String },
-    data: { required: true, type: Object }
-  },
-  data () {
-    return {
-      Modes: Modes,
-
-      type: InputTypes.TEXT,
-      isActiveFill: false,
-      valueCache: null
-    }
-  },
-  methods: {
-    submitFillMenu () {
-      this.isActiveFill = false
+  export default {
+    name: 'TextareaElementInput',
+    components: {
+      EditMenuContent: TextareaElementInputEditMenuContent
     },
-    cancelFillMenu () {
-      this.dataValue = this.valueCache
-
-      this.isActiveFill = false
+    props: {
+      id: { required: true, type: String },
+      mode: { required: true, type: String },
+      data: { required: true, type: Object }
     },
-    onComponentCreated () {},
-    onComponentMounted () {}
-  },
-  watch: {
-    isActiveFill: {
-      handler (value) {
-        if (value) {
-          this.valueCache = this.data.value
+    data() {
+      return {
+        Modes: Modes,
+
+        type: InputTypes.TEXT,
+        isActiveFill: false,
+        valueCache: null
+      };
+    },
+    computed: {
+      isActiveEdit() {
+        return this.$store.state.constructorModule.activeTextareaElement?.activeInput?.id === this.id;
+      },
+      classNames() {
+        return {
+          'textarea-element-input': true,
+          'textarea-element-input_is-open': this.isActiveEdit || this.isActiveFill,
+          [`textarea-element-input_mode_${this.mode.toLowerCase()}`]: true,
+          [`textarea-element-input-${this.type.toLowerCase()}`]: true
+        };
+      },
+      attributes() {
+        return {
+          id: this.id,
+          class: this.classNames,
+          contenteditable: false,
+          'data-textarea-element-input': this.type.toLowerCase()
+        };
+      },
+      editMenuAttributes() {
+        return {
+          value: this.isActiveEdit,
+          closeOnClick: false,
+          closeOnContentClick: false,
+          openOnClick: false,
+          contentClass: 'textarea-element-input-edit-menu',
+          offsetY: true,
+          top: true
+        };
+      },
+      fillMenuAttributes() {
+        return {
+          closeOnContentClick: false,
+          contentClass: 'textarea-element-input-fill-menu',
+          offsetY: true
+        };
+      },
+      dataValue: {
+        get() {
+          return this.data.value;
+        },
+        set(value) {
+          this.$emit('update:data', { ...this.data, value });
         }
       }
-    }
-  },
-  computed: {
-    isActiveEdit () {
-      return this.$store.state.constructorModule.activeTextareaElement?.activeInput?.id === this.id
     },
-    classNames () {
-      return {
-        'textarea-element-input': true,
-        'textarea-element-input_is-open': this.isActiveEdit || this.isActiveFill,
-        [`textarea-element-input_mode_${this.mode.toLowerCase()}`]: true,
-        [`textarea-element-input-${this.type.toLowerCase()}`]: true
+    watch: {
+      isActiveFill: {
+        handler(value) {
+          if (value) {
+            this.valueCache = this.data.value;
+          }
+        }
       }
     },
-    attributes () {
-      return {
-        id: this.id,
-        class: this.classNames,
-        contenteditable: false,
-        'data-textarea-element-input': this.type.toLowerCase()
-      }
+    created() {
+      this.onComponentCreated();
     },
-    editMenuAttributes () {
-      return {
-        value: this.isActiveEdit,
-        closeOnClick: false,
-        closeOnContentClick: false,
-        openOnClick: false,
-        contentClass: 'textarea-element-input-edit-menu',
-        offsetY: true,
-        top: true
+    mounted() {
+      // Удаляем неиспользуемый HTML элемент, который генерирует компонент VMenu, так как он является блочным и ломает layout контента в редакторе
+      const [uselessMenuHTMLElement] = this.$el.getElementsByClassName('v-menu');
+      if (uselessMenuHTMLElement) {
+        this.$nextTick(() => {
+          uselessMenuHTMLElement.remove();
+        });
       }
-    },
-    fillMenuAttributes () {
-      return {
-        closeOnContentClick: false,
-        contentClass: 'textarea-element-input-fill-menu',
-        offsetY: true
-      }
-    },
-    dataValue: {
-      get () {
-        return this.data.value
-      },
-      set (value) {
-        this.$emit('update:data', { ...this.data, value })
-      }
-    }
-  },
-  created () {
-    this.onComponentCreated()
-  },
-  mounted () {
-    // Удаляем неиспользуемый HTML элемент, который генерирует компонент VMenu, так как он является блочным и ломает layout контента в редакторе
-    const [uselessMenuHTMLElement] = this.$el.getElementsByClassName('v-menu')
-    if (uselessMenuHTMLElement) {
-      this.$nextTick(() => {
-        uselessMenuHTMLElement.remove()
-      })
-    }
 
-    this.onComponentMounted()
-  }
-}
+      this.onComponentMounted();
+    },
+    methods: {
+      submitFillMenu() {
+        this.isActiveFill = false;
+      },
+      cancelFillMenu() {
+        this.dataValue = this.valueCache;
+
+        this.isActiveFill = false;
+      },
+      onComponentCreated() {},
+      onComponentMounted() {}
+    }
+  };
 </script>
 
 <style>

@@ -10,15 +10,15 @@
 </template>
 
 <script>
-export default {
-  name: 'TextareaElementInputEditMenuContent',
-  metgods: {
-    onMousedown (event) {
-      /* Чтобы не терять фокус на редакторе */
-      event.preventDefault()
+  export default {
+    name: 'TextareaElementInputEditMenuContent',
+    metgods: {
+      onMousedown(event) {
+        /* Чтобы не терять фокус на редакторе */
+        event.preventDefault();
+      }
     }
-  }
-}
+  };
 </script>
 
 <style>

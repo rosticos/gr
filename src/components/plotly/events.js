@@ -26,7 +26,7 @@ const eventsName = [
   'Transitioning',
   'TransitionInterrupted',
   'Unhover'
-]
+];
 
 export const events = eventsName
   .map(evt => evt.toLocaleLowerCase())
@@ -36,4 +36,4 @@ export const events = eventsName
       // eslint-disable-next-line
       context.$emit.apply(context, [eventName, ...args])
     }
-  }))
+  }));

@@ -1,10 +1,10 @@
-import TextareaElementInputText from '../textarea-element-input-text.vue'
+import TextareaElementInputText from '../textarea-element-input-text.vue';
 
 export const InputTypes = {
   TEXT: 'TEXT'
   // FILE: 'FILE',
   // SELECT: 'SELECT'
-}
+};
 
 export const InputTypesDefaults = {
   // [InputTypes.SELECT]: {
@@ -32,4 +32,4 @@ export const InputTypesDefaults = {
   //     value: null
   //   }
   // }
-}
+};

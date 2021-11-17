@@ -1,13 +1,13 @@
 <script>
-import Bar from '../bar.vue'
+  import Bar from '../bar.vue';
 
-export default {
-  name: 'TypesCreateBar',
-  extends: Bar,
-  data: () => {
-    return {
-      submitText: 'Создать'
+  export default {
+    name: 'TypesCreateBar',
+    extends: Bar,
+    data: () => {
+      return {
+        submitText: 'Создать'
+      };
     }
-  }
-}
+  };
 </script>

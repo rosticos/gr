@@ -5,11 +5,11 @@
         <div class="constructor-header-toolbar__tinymce-toolbar" />
       </div>
       <div class="container">
-        <div id="kek"></div>
+        <div id="kek" class="textarea-element-edit__editor" />
       </div>
     </template>
     <template v-else-if="mode === Modes.FILL">
-      <div></div>
+      <div />
     </template>
     <template v-else-if="mode === Modes.VIEW">
       <!-- eslint-disable-next-line vue/no-v-html -->
@@ -19,112 +19,120 @@
 </template>
 
 <script>
-import tinymce from 'tinymce'
+  import tinymce from 'tinymce';
 
-/* Default icons are required for TinyMCE 5.3 or above */
-import 'tinymce/icons/default'
+  /* Default icons are required for TinyMCE 5.3 or above */
+  import 'tinymce/icons/default';
 
-/* A theme is also required */
-import 'tinymce/themes/silver'
+  /* A theme is also required */
+  import 'tinymce/themes/silver';
 
-/* Import the skin */
-import 'tinymce/skins/ui/oxide/skin.css'
+  /* Import the skin */
+  import 'tinymce/skins/ui/oxide/skin.css';
+  import 'tinymce/skins/ui/oxide/content.css';
 
-/* Import plugins */
-import 'tinymce/plugins/advlist'
-import 'tinymce/plugins/code'
-import 'tinymce/plugins/link'
-import 'tinymce/plugins/lists'
-import 'tinymce/plugins/table'
+  /* Import plugins */
+  import 'tinymce/plugins/advlist';
+  import 'tinymce/plugins/code';
+  import 'tinymce/plugins/link';
+  import 'tinymce/plugins/image';
+  import 'tinymce/plugins/imagetools';
+  import 'tinymce/plugins/lists';
+  import 'tinymce/plugins/table';
 
-import '@wiris/mathtype-tinymce5'
+  import '@wiris/mathtype-tinymce5';
 
-import { TextareaModes as Modes } from './consts/modes'
+  import { TextareaModes as Modes } from './consts/modes';
 
-export default {
-  components: {
+  export default {
+    components: {
     // Textarea
     // TextareaElementEdit,
     // TextareaElementFill
-  },
-  props: {
-    // id: { required: true, type: String },
-    // documentPartId: { required: true, type: String },
-    value: { default: '', type: String },
-    mode: { default: Modes.EDIT, type: String }
-  },
-  computed: {
-    syncValue: {
-      set (value) {
-        this.$emit('value:update', value)
+    },
+    props: {
+      // id: { required: true, type: String },
+      // documentPartId: { required: true, type: String },
+      value: { default: '', type: String },
+      mode: { default: Modes.EDIT, type: String }
+    },
+    data() {
+      return {
+        Modes: Modes,
+        isEditorInitialized: false,
+
+        isFocused: false,
+        editor: null,
+        placeholder: 'Напишите здесь необходимую информацию'
+      };
+    },
+    computed: {
+      syncValue: {
+        set(value) {
+          this.$emit('value:update', value);
+        },
+        get() {
+          return this.value;
+        }
+      }
+    },
+    watch: {
+      'data.inputsData': {
+        deep: true,
+        handler() {
+          this.updateTemplate();
+        }
+      }
+    },
+    mounted() {
+      this.setupEditor();
+    },
+    methods: {
+      async setupEditor() {
+        const [editor] = await tinymce.init({
+          base_url: '/tinymce',
+          selector: '#kek',
+          height: 500,
+          icons_url: '/tinymce/icons/editor-icons/index.js',
+          icons: 'editor-icons',
+          inline: true,
+          placeholder: 'Ask a question or post an update...',
+          contextmenu: false,
+          menubar: false,
+          language: 'ru',
+          table_resize_bars: false,
+          keep_styles: false,
+          automatic_uploads: true,
+          quickbars_insert_toolbar: false,
+          content_style: 'img {max-width: 100%;}',
+          paste_data_images: true,
+          quickbars_selection_toolbar: 'bold italic underline',
+          plugins: 'placeholder code link lists table tiny_mce_wiris image imagetools',
+          toolbar: 'undo redo | formatselect | ' +
+            ' bold italic backcolor | alignleft aligncenter ' +
+            ' alignright alignjustify | bullist numlist outdent indent |' +
+            ' removeformat | tiny_mce_wiris_formulaEditor | image'
+
+        });
+
+        this.editor = editor;
+
+        setTimeout(() => {
+          this.isEditorInitialized = true;
+        });
       },
-      get () {
-        return this.value
-      }
-    }
-  },
-  data () {
-    return {
-      Modes: Modes,
-      isEditorInitialized: false,
-
-      isFocused: false,
-      editor: null,
-      placeholder: 'Напишите здесь необходимую информацию'
-    }
-  },
-  methods: {
-    async setupEditor () {
-      const [editor] = await tinymce.init({
-        base_url: '/tinymce',
-        selector: '#kek',
-        height: 500,
-        icons_url: '/tinymce/icons/editor-icons/index.js',
-        icons: 'editor-icons',
-        placeholder: 'Ask a question or post an update...',
-        inline: true,
-        contextmenu: false,
-        menubar: false,
-        language: 'ru',
-        table_resize_bars: false,
-        keep_styles: false,
-        quickbars_insert_toolbar: false,
-        quickbars_selection_toolbar: 'bold italic underline',
-        plugins: 'placeholder code link lists table tiny_mce_wiris',
-        toolbar: 'undo redo | formatselect | ' +
-  ' bold italic backcolor | alignleft aligncenter ' +
-  ' alignright alignjustify | bullist numlist outdent indent |' +
-  ' removeformat | tiny_mce_wiris_formulaEditor'
-
-      })
-
-      this.editor = editor
-
-      setTimeout(() => {
-        this.isEditorInitialized = true
-      })
-    },
-    focus () {
-      if (this.mode === Modes.EDIT) {
-        this.elementEdit.focusEditor()
-      }
-    },
-    updateTemplate (template) {
+      focus() {
+        if (this.mode === Modes.EDIT) {
+          this.elementEdit.focusEditor();
+        }
+      },
+      updateTemplate(template) {
+        console.log('%ctextarea-editor.vue line:130 template', 'color: #007acc;', template);
+        //
       // this.data.template = normalizeTemplate(template ?? this.data.template, this.data.inputsData)
-    }
-  },
-  watch: {
-    'data.inputsData': {
-      deep: true,
-      handler () {
-        this.updateTemplate()
       }
     }
-  },
-  mounted () {
-    this.setupEditor()
-  }
-}
+  };
 </script>
 
 <style>

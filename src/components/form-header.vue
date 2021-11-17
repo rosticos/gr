@@ -11,14 +11,14 @@
 </template>
 
 <script>
-export default {
-  name: 'FormHeader',
-  methods: {
-    create (type) {
-      this.$emit(`create-${type}`)
+  export default {
+    name: 'FormHeader',
+    methods: {
+      create(type) {
+        this.$emit(`create-${type}`);
+      }
     }
-  }
-}
+  };
 </script>
 
 <style>

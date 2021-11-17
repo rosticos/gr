@@ -3,4 +3,4 @@ export const TextareaModes = {
   EDIT: 'EDIT',
   FILL: 'FILL',
   VIEW: 'VIEW'
-}
+};

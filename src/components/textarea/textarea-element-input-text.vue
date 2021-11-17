@@ -46,16 +46,16 @@
 </template>
 
 <script>
-import TextareaElementInputBase from '../textarea/base/textarea-element-input.vue'
-import { DocumentPartElementTextareaInputTypes as InputTypes } from '@/document-part-elements/enums/document-part-element-textarea-input-types'
+  import TextareaElementInputBase from '../textarea/base/textarea-element-input.vue';
+  import { DocumentPartElementTextareaInputTypes as InputTypes } from '@/document-part-elements/enums/document-part-element-textarea-input-types';
 
-export default {
-  name: 'TextareaElementInputText',
-  extends: TextareaElementInputBase,
-  data () {
-    return {
-      type: InputTypes.TEXT
+  export default {
+    name: 'TextareaElementInputText',
+    extends: TextareaElementInputBase,
+    data() {
+      return {
+        type: InputTypes.TEXT
+      };
     }
-  }
-}
+  };
 </script>
