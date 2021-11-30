@@ -8,8 +8,8 @@
         v-on:download="onDownload" />
       <div class="constructor-header-toolbar__tinymce-toolbar" />
     </div>
-    
-    <div class="editor-page__container">
+
+    <div v-if="viewTree.length" class="editor-page__container">
       <div class="wrapper">
         <div class="container">
           <div 
@@ -144,31 +144,24 @@
         viewTree: []
       };
     },
-    created() {
-      this.viewTree.map((item, index) => {
-        if (item.type === 'graph') {
-          item.value.map((graph) => {
-            this.onCreate(
-              {
-                index,
-                values: graph.values,
-                layout: graph.layout,
-                type: graph.values[0].type
-              },
-              true
-            );
-          });
-        }
-
-        if (item.type === 'text') {
-        //
-        }
-      });
-    },
     methods: {
+      normalizeViewTree(viewTree) {
+        return viewTree.map(v => {
+          if (v.type === 'graph') {
+            return {
+              id: v.id,
+              type: v.type,
+              value: v.value,
+              normalizedValue: []
+            };
+          }
+
+          return v;
+        });
+      },
       onDownload() {
         const a = window.document.createElement('a');
-        var file = new Blob([JSON.stringify(this.viewTree)], {type: 'text/plain'});
+        var file = new Blob([JSON.stringify(this.normalizeViewTree(this.viewTree))], {type: 'text/plain'});
         const url = URL.createObjectURL(file);
 
         a.href = url;
@@ -181,10 +174,10 @@
 
         window.URL.revokeObjectURL(url);
       },
-      onImport(viewTree) {
+      async onImport(viewTree) {
         this.viewTree = viewTree;
-
-        this.viewTree.map((item, index) => {
+        
+        this.viewTree = this.viewTree.map((item, index) => {
           if (item.type === 'graph') {
             item.value.map((graph) => {
               this.onCreate(
@@ -202,6 +195,8 @@
           if (item.type === 'text') {
             //
           }
+
+          return item;
         });
 
       },
@@ -222,7 +217,7 @@
         this.viewTree.push({
           id: uuid(),
           type: 'text',
-          value: 'text'
+          value: '<p></p>'
         });
       },
       onUpdate() {
@@ -343,9 +338,9 @@
     background: #F2F3F7;
   }
   .editor-page__container {
-    padding: 20px 0;
+    padding: 60px 0;
     display: flex;
-    flex: 1 1 0;
+    flex: 1 1 auto;
   }
 
   .editor-page .wrapper {
@@ -365,6 +360,8 @@
     height: 38px;
     padding: 0px;
     width: 100%;
+    position: fixed;
+    z-index: 100;
   }
   .constructor-header-toolbar__structure {
     margin-right: 8px;

@@ -27,6 +27,10 @@ export default function createEditorConfig(componentContext) {
       editor.setContent(componentContext.syncValue);
     },
     setup: (editor) => {
+      editor.on('NodeChange', () => {
+        componentContext.updateTemplate();
+      });
+      
       editor.on('input', () => {
         componentContext.onEditorInput();
 

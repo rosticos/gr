@@ -61,7 +61,7 @@
     computed: {
       syncValue: {
         set(value) {
-          this.$emit('value:update', value);
+          this.$emit('update:value', value);
         },
         get() {
           return this.value;
@@ -73,14 +73,6 @@
           [`textarea-element-edit_mode_${this.mode.toLowerCase()}`]: true,
           'is-dirty': this.tinymceIsDirty
         };
-      }
-    },
-    watch: {
-      'data.inputsData': {
-        deep: true,
-        handler() {
-          this.updateTemplate();
-        }
       }
     },
     mounted() {
