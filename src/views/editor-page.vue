@@ -14,7 +14,7 @@
         <div class="container">
           <div 
             v-for="(item, index) in viewTree"
-            v-bind:key="`tree-${index}`"
+            v-bind:key="item.id"
             class="document-part document-part-class-free document-part_mode_edit document-part-class-free_mode_edit">
             <div v-if="item.type === 'graph'">
               <div v-for="graph in item.normalizedValue" v-bind:key="graph.id">
@@ -59,7 +59,7 @@
 
               <div class="textarea-element">
                 <textarea-editor 
-                  v-bind:id="item.id"
+                  v-bind:id="`textarea-${item.id}`"
                   class="textarea-element__edit"
                   v-bind:value.sync="item.value" />
               </div>
@@ -156,6 +156,13 @@
             };
           }
 
+          if (v.type === 'text') {
+            return {
+              type: v.type,
+              value: v.value
+            };
+          }
+
           return v;
         });
       },
@@ -194,6 +201,11 @@
 
           if (item.type === 'text') {
             //
+            return {
+              id: uuid(),
+              type: item.type,
+              value: item.value
+            };
           }
 
           return item;
@@ -211,7 +223,13 @@
         this.expandItem = item;
       },
       removeItem(index) {
-        this.viewTree.splice(index, 1);
+        this.viewTree = this.viewTree.filter((v, i)=> {
+          if (index === i) {
+            return false;
+          }
+
+          return true;
+        });
       },
       createTextarea() {
         this.viewTree.push({
@@ -221,7 +239,8 @@
         });
       },
       onUpdate() {
-      //
+        //
+        this.isVisibleMenu = false;
       },
       onCreate({ index, values, layout, type }, isMountEvent = false) {
         this.error = null;
@@ -233,6 +252,8 @@
             value: [{ values, layout, type }],
             normalizedValue: []
           });
+
+          this.isVisibleMenu = false;
         }
 
         if (index == null) {

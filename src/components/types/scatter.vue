@@ -2,7 +2,7 @@
   <div>
     <div v-for="(line, index) in lines" v-bind:key="index">
       <hr>
-      <div class="card__content d-flex">
+      <div class="card__content d-flex align-center">
         <p class="p-title-bold">{{ line.name || 'Новая линия' }}</p>
         <div class="ml-auto btn btn_outline ml-2" v-on:click="removeLine(index)">
           <div class="p-icon p-icon-close" />

@@ -42,7 +42,6 @@
     },
     props: {
       id: { required: true, type: String },
-      // documentPartId: { required: true, type: String },
       value: { default: '', type: String },
       mode: { default: Modes.EDIT, type: String }
     },

@@ -1,7 +1,6 @@
 <template>
   <div class="card card_column">
     <div v-for="(graph, index) in expandItem.value" v-bind:key="index">
-      <hr>
       <div>
         <div
           class="card__content card__content_active d-flex"
@@ -138,7 +137,7 @@
         if (graph.type === 'pie') {
           const normalizedPies = values.map((pie, index) => this.normalizePie(pie, index / 2, index % 2));
 
-          this.expandItem[index].normalizedGraphs = this.expandItem[index].normalizedValue.map((graph, curIndex) => {
+          this.expandItem.normalizedValue = this.expandItem.normalizedValue.map((graph, curIndex) => {
             if (curIndex === index) {
               graph = {
                 layout: {
@@ -156,7 +155,7 @@
         if (graph.type === 'bar') {
           const normalizedBars = values.map(bar => this.normalizeBar(bar));
 
-          this.expandItem[index].normalizedGraphs = this.expandItem[index].normalizedValue.map((graph, curIndex) => {
+          this.expandItem.normalizedValue = this.expandItem.normalizedValue.map((graph, curIndex) => {
             if (curIndex === index) {
               graph = {
                 layout: {
@@ -170,6 +169,8 @@
             return graph;
           });
         }
+
+        this.$emit('update');
       },
       addLine() {
       //

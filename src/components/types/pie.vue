@@ -1,7 +1,6 @@
 <template>
   <div>
-    <hr>
-    <div class="card__content">
+    <div class="card__content align-center">
       <p class="p-input__label">Название:</p>
       <input v-model="layout.title" type="text" class="input-block ml-2">
     </div>
@@ -20,13 +19,13 @@
       </div>
 
       <div class="mt-4">
-        <div v-for="counter in pie.counter" v-bind:key="counter" class="d-flex mt-2">
-          <div class="d-flex">
+        <div v-for="counter in pie.counter" v-bind:key="counter" class="d-flex align-center mt-2">
+          <div class="d-flex align-center">
             <p class="p-input__label">Наим:</p>
             <input v-model="pie.labels[counter - 1]" type="text" class="input-block ml-2">
           </div>
 
-          <div class="d-flex ml-2">
+          <div class="d-flex align-center ml-2">
             <p class="p-input__label">Значение:</p>
             <input v-model="pie.values[counter - 1]" type="text" class="input-block ml-2">
           </div>

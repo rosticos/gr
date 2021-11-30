@@ -1,8 +1,7 @@
 <template>
   <div>
-    <hr>
     <div class="card card_column">
-      <div class="card__content d-flex">
+      <div class="card__content d-flex align-center">
         <p class="p-input__label">Название:</p>
         <input v-model="layout.title" type="text" class="ml-2 input-block">
       </div>
@@ -15,7 +14,7 @@
         Добавить столбец
       </div>
       <div v-for="(_, titleIndex) in titles" v-bind:key="titleIndex">
-        <div class="d-flex mt-2">
+        <div class="d-flex align-center mt-2">
           <p class="p-input__label">Столбец:</p>
           <input v-model="titles[titleIndex]" type="text" class="input-block ml-2">
 
@@ -30,14 +29,14 @@
 
     <div v-for="(bar, index) in bars" v-bind:key="`bar-${index}`" class="card card_column card_background-light-grey">
       <div class="card__content">
-        <div class="d-flex">
+        <div class="d-flex align-center">
           <p class="p-title-bold">Столбец {{ index + 1 }}</p>
           <div class="btn btn_outline ml-auto" v-on:click="removeBar(index)">
             <div class="p-icon p-icon-close" />
           </div>
         </div>
         <div v-for="counter in bar.counter" v-bind:key="counter" class="mt-2">
-          <div class="d-flex mr-2">
+          <div class="d-flex align-center mr-2">
             <p class="p-input__label">{{ titles[counter - 1] }}:</p>
             <input v-model="bar.values[counter - 1]" type="text" class="ml-2 input-block">
           </div>
@@ -62,6 +61,23 @@
 <script>
   export default {
     name: 'Bar',
+    data: () => {
+      return {
+        submitText: 'Создать',
+        layout: {
+          title: 'Столбцы'
+        },
+        titles: ['Столбец'],
+        bars: [
+          {
+            counter: 1,
+            type: 'bar',
+            name: '',
+            values: []
+          }
+        ]
+      };
+    },
     methods: {
       setDefault() {
         this.bars = [
