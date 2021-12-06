@@ -26,6 +26,8 @@
   import 'tinymce/plugins/link';
   import 'tinymce/plugins/image';
   import 'tinymce/plugins/imagetools';
+  import 'tinymce/plugins/quickbars';
+  import 'tinymce/plugins/paste';
   import 'tinymce/plugins/lists';
   import 'tinymce/plugins/table';
 
@@ -33,6 +35,7 @@
 
   import { TextareaModes as Modes } from './consts/modes';
   import createEditorConfig from './helpers/create-editor-config';
+
 
   export default {
     components: {
@@ -82,7 +85,7 @@
     },
     methods: {
       async setupEditor() {
-        const [ editor ] = await tinymce.init(createEditorConfig(this));
+        const [ editor ] = await tinymce.init(createEditorConfig(this, tinymce));
 
         this.editor = editor;
       },
