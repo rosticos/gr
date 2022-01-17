@@ -1,0 +1,106 @@
+/* Editor styles */
+
+.mce-content-body {
+  outline: none;
+}
+.tox-tinymce-inline {
+  font-family: inherit !important;
+  width: 100%;
+}
+.tox-tinymce-inline .tox-editor-header {
+  border: none !important;
+  height: 100% !important;
+  margin: 0 !important;
+  max-width: unset !important;
+}
+.tox-tinymce-inline .tox-editor-header .tox-toolbar__primary {
+  background: none !important;
+}
+.tox:not([dir=rtl]) .tox-toolbar__group:not(:last-of-type) {
+  border-color: var(--color-light-grey) !important;
+}
+.tox:not([dir=rtl]) .tox-toolbar__group:first-of-type {
+  border-left: 1px solid var(--color-light-grey) !important;
+}
+.tox .editor-icon {
+  fill: none !important;
+}
+.tox .tox-tbtn {
+  border-radius: 6px !important;
+  color: var(--color-deep-blue) !important;
+  height: 32px !important;
+  margin: 0 !important;
+  width: 32px !important;
+  cursor: pointer;
+}
+.tox .tox-tbtn--select {
+  padding: 0 12px !important;
+  width: auto !important;
+}
+.tox .tox-tbtn svg {
+  fill: var(--color-deep-blue);
+}
+.tox .tox-tbtn:hover {
+  background: var(--color-white-smoke) !important;
+}
+.tox .tox-tbtn--enabled, .tox .tox-tbtn--enabled:hover {
+  background: var(--color-light-grey) !important;
+}
+.tox .tox-tbtn--disabled {
+  color: var(--color-light-grey) !important;
+}
+.tox-toolbar__group {
+  display: grid;
+  grid-auto-flow: column;
+  grid-gap: 8px;
+  padding: 0 8px !important;
+}
+.tox .tox-collection__item-label {
+  word-break: normal;
+}
+
+/* Editor quickbar styles */
+
+.tox-pop::before, .tox-pop::after {
+  display: none !important;
+}
+.tox-pop__dialog {
+  border: none !important;
+  border-radius: 6px !important;
+  box-shadow: var(--shadow-card-hover) !important;
+}
+.tox-pop__dialog .tox-toolbar {
+  margin: 0 !important;
+}
+.tox-pop .tox-toolbar__group {
+  grid-gap: 4px;
+  padding: 4px !important;
+}
+.tox-pop .tox-tbtn {
+  height: 24px !important;
+  width: 24px !important;
+}
+.tox-pop .tox-tbtn--select {
+  width: auto !important;
+}
+.tox-pop .tox-tbtn svg {
+  transform: scale(0.6666);
+}
+
+/* Editor Toolbar buttons */
+
+.tox-tinymce-inline .tox-toolbar__group[title='Форматы'] {
+  font-weight: 500 !important;
+}
+.tox-tinymce-inline .tox-toolbar__group[title='Форматы'] .tox-tbtn,
+.tox-tinymce-inline .tox-toolbar__group[title='Форматы'] .tox-tbtn .tox-tbtn__select-label {
+  font-weight: inherit;
+}
+
+/* Fixes */
+
+.mce-pastebin {
+  /* При copy-paste в редактор мерцает служебный quickbar (.mce-pastebin), он появляется при активированном paste plugin'e */
+  display: none;
+  visibility: hidden;
+}

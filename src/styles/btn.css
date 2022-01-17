@@ -1,3 +1,9 @@
+.btn-container_s {
+  display: flex;
+  margin-top: 22px;
+  margin-left: 8px;
+}
+
 .btn {
   border-radius: 8px;
   font-family: inherit;
