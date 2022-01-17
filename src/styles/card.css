@@ -1,0 +1,66 @@
+
+.card {
+  display: flex;
+  background: #ffffff;
+  border-radius: var(--base-radius);
+}
+
+.card_column {
+  flex-direction: column;
+}
+
+.card__content {
+  padding: 16px;
+  transition: all .3s ease;
+}
+
+.card__content_active {
+  cursor: pointer;
+}
+.card__content_active:hover,
+.card__content_active:active {
+  background: var(--color-light-grey-transparent);
+}
+
+.card__actions {
+  background: #fff;
+  border-top: 1px solid var(--color-light-grey);
+  display: flex;
+  position: fixed;
+  bottom: 0;
+  width: 500px;
+  height: 71px;
+}
+
+.card > .input-block + .input-block {
+  margin-top: 0;
+  margin-left: 16px;
+}
+
+.d-flex > .input-block + .input-block {
+  margin-top: 0;
+  margin-left: 16px;
+}
+
+.plotly {
+  position: relative;
+}
+
+.plotly__actions {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 0px;
+  z-index: 100;
+}
+
+.wrap {
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.plotly__actions > .btn + .btn {
+  margin-top: 16px;
+}

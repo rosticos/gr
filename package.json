@@ -1,16 +1,45 @@
 {
   "name": "plotly",
   "version": "1.0.0",
-  "description": "",
-  "main": "gulpfile.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "gulp": "gulp serve"
-  },
+  "private": true,
   "author": "",
-  "license": "ISC",
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "@babel/preset-env": "^7.16.4",
+    "@wiris/mathtype-tinymce5": "^7.27.0",
+    "babel-polyfill": "^6.26.0",
+    "core-js": "^3.6.5",
+    "eslint-plugin-vue": "7.17.0",
+    "mathjs": "^9.4.4",
+    "plotly.js": "^2.4.2",
+    "tinymce": "^5.9.1",
+    "uuid": "^8.3.2",
+    "vue": "^2.6.11",
+    "vue-router": "^3.2.0",
+    "vuex": "^3.4.0"
+  },
   "devDependencies": {
-    "browser-sync": "^2.26.14",
-    "gulp": "^4.0.2"
-  }
+    "@babel/plugin-proposal-nullish-coalescing-operator": "^7.16.0",
+    "@babel/plugin-proposal-optional-chaining": "^7.16.0",
+    "@vue/cli-plugin-babel": "^4.5.15",
+    "@vue/cli-plugin-eslint": "^3.4.0",
+    "@vue/cli-service": "^3.4.0",
+    "babel-eslint": "^10.0.1",
+    "eslint": "7.32.0",
+    "postcss-preset-env": "^6.7.0",
+    "sass": "^1.43.4",
+    "sass-loader": "^7.0.1",
+    "style-resources-loader": "^1.2.1",
+    "stylus-loader": "^3.0.2",
+    "vue-template-compiler": "^2.5.21"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
 }
