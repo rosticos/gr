@@ -3,7 +3,7 @@ export default function createEditorConfig(componentContext) {
     base_url: '/tinymce',
     selector: `#${componentContext.editorId}`,
     height: 500,
-    placeholder: 'Напишите здесь необходимую информацию или вставьте картинку',
+    placeholder: 'Введите текст или вставьте изображение',
     icons_url: '/tinymce/icons/editor-icons/index.js',
     icons: 'editor-icons',
     inline: true,
@@ -18,11 +18,11 @@ export default function createEditorConfig(componentContext) {
     paste_data_images: true,
     fixed_toolbar_container: '.constructor-header-toolbar__tinymce-toolbar',
     quickbars_selection_toolbar: 'bold italic underline',
-    plugins: 'code link lists table tiny_mce_wiris image imagetools quickbars paste',
+    plugins: 'code link lists advlist table tiny_mce_wiris image imagetools quickbars paste',
     toolbar: 'undo redo | formatselect | ' +
       ' bold italic backcolor | alignleft aligncenter ' +
       ' alignright alignjustify | bullist numlist outdent indent |' +
-      ' removeformat | tiny_mce_wiris_formulaEditor | quickimage',
+      ' tiny_mce_wiris_formulaEditor | quickimage link table | removeformat',
     init_instance_callback: (editor) => {
       editor.setContent(componentContext.syncValue);
     },
@@ -30,7 +30,7 @@ export default function createEditorConfig(componentContext) {
       editor.on('NodeChange', () => {
         componentContext.updateTemplate();
       });
-      
+
       editor.on('input', () => {
         componentContext.onEditorInput();
 
@@ -39,6 +39,5 @@ export default function createEditorConfig(componentContext) {
         // editorScrollIntoView(editor);
       });
     }
-
   };
 }
