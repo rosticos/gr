@@ -144,6 +144,9 @@
         viewTree: []
       };
     },
+    mounted() {
+      this.createTextarea();
+    },
     methods: {
       normalizeViewTree(viewTree) {
         return viewTree.map(v => {

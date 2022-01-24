@@ -11,7 +11,6 @@ export default function createEditorConfig(componentContext) {
     contextmenu: false,
     block_unsupported_drop: false,
     menubar: false,
-    language: 'ru',
     table_resize_bars: false,
     keep_styles: false,
     htmlAllowedTags: ['.*'],
