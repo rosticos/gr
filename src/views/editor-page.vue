@@ -182,9 +182,7 @@
         window.URL.revokeObjectURL(url);
       },
       async onImport(viewTree) {
-        this.viewTree = viewTree;
-        
-        this.viewTree = this.viewTree.map((item, index) => {
+        this.viewTree = viewTree.map((item, index) => {
           if (item.type === 'graph') {
             item.value.map((graph) => {
               this.onCreate(
@@ -210,7 +208,6 @@
 
           return item;
         });
-
       },
       createGrapg() {
         this.isVisibleMenu = true;
