@@ -55,10 +55,7 @@
     cursor: pointer;
   }
 
-  .nav__btn + .nav__btn {
-    border-left: 1px solid var(--color-light-grey);
-  }
-
+  .nav__btn + .nav__btn {}
 
   .nav__btn_close:hover,
   .nav__btn_close:active {

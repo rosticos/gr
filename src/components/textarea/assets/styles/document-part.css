@@ -3,6 +3,9 @@
   padding: 28px 64px;
   position: relative;
 }
+.document-part_graph {
+  min-height: 128px;
+}
 .document-part_mode_view {
   padding-bottom: 0;
 }
