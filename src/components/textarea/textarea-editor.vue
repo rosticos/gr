@@ -77,8 +77,8 @@
         };
       }
     },
-    mounted() {
-      this.setupEditor();
+    async mounted() {
+      await this.setupEditor();
     },
     created() {
       this.editorId = 'editor-' + this.id;
