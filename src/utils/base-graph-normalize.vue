@@ -38,7 +38,7 @@
           const { x, y } = this.createFunctionalLine(line, xMin, xMax);
 
           return {
-            name: line.value,
+            name: line.name,
             type: line.type,
             mode: line.mode,
             x,

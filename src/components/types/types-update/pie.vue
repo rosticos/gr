@@ -5,7 +5,7 @@
     name: 'TypesUpdatePie',
     extends: Pie,
     props: {
-      graph: Object
+      graph: { type: Object, default: () => ({}) }
     },
     data: () => {
       return {
