@@ -16,12 +16,8 @@
     directives,
     inheritAttrs: false,
     props: {
-      data: {
-        type: Array
-      },
-      layout: {
-        type: Object
-      },
+      data: { type: Array, default: () => ([]) },
+      layout: { type: Object, default: () => ({}) },
       id: {
         type: String,
         required: false,

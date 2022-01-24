@@ -16,20 +16,19 @@
             v-for="(item, index) in viewTree"
             v-bind:key="item.id"
             class="document-part document-part-class-free document-part_mode_edit document-part-class-free_mode_edit">
-            <div v-if="item.type === 'graph'">
-              <div v-for="graph in item.normalizedValue" v-bind:key="graph.id">
-                <div class="plotly__actions">
-                  <div
-                    class="btn btn_outline ml-2"
-                    v-on:click="removeItem(index)">
-                    <div class="p-icon p-icon-close" />
-                  </div>
-
-                  <div class="btn btn_outline ml-2" v-on:click="editGraph(item)">
-                    <div class="p-icon p-icon-edit" />
-                  </div>
+            <div v-if="item.type === 'graph'" class="document-part_graph">
+              <div class="plotly__actions">
+                <div
+                  class="btn btn_outline ml-2"
+                  v-on:click="removeItem(index)">
+                  <div class="p-icon p-icon-close" />
                 </div>
-                
+
+                <div class="btn btn_outline ml-2" v-on:click="editGraph(item)">
+                  <div class="p-icon p-icon-edit" />
+                </div>
+              </div>
+              <div v-for="graph in item.normalizedValue" v-bind:key="graph.id">
                 <div class="plotly">
                   <plotly
                     v-bind:data="graph.data"
@@ -144,6 +143,9 @@
         viewTree: []
       };
     },
+    mounted() {
+      this.createTextarea('Импортируйте имеющийся документ или начните создавать новый с добавления блоков <b>«График»</b> или <b>«Текст»</b>.');
+    },
     methods: {
       normalizeViewTree(viewTree) {
         return viewTree.map(v => {
@@ -183,7 +185,7 @@
       },
       async onImport(viewTree) {
         this.viewTree = viewTree;
-        
+
         this.viewTree = this.viewTree.map((item, index) => {
           if (item.type === 'graph') {
             item.value.map((graph) => {
@@ -210,7 +212,6 @@
 
           return item;
         });
-
       },
       createGrapg() {
         this.isVisibleMenu = true;
@@ -231,11 +232,11 @@
           return true;
         });
       },
-      createTextarea() {
+      createTextarea(initValue = '') {
         this.viewTree.push({
           id: uuid(),
           type: 'text',
-          value: '<p></p>'
+          value: `<p>${ initValue }</p>`
         });
       },
       onUpdate() {
