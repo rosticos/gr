@@ -1,7 +1,7 @@
 <template>
   <div class="card card_column">
-    <div v-for="(graph, index) in expandItem.value" v-bind:key="index">
-      <div>
+    <div v-if="expandItem">
+      <div v-for="(graph, index) in expandItem.value" v-bind:key="index">
         <div
           class="card__content card__content_active d-flex"
           v-on:click="setExpand(index)">
@@ -41,10 +41,7 @@
     extends: BaseGraphNormalize,
     props: {
       type: { type: String, default: '' },
-      expandItem: {
-        type: [Number, Object],
-        default: null
-      }
+      expandItem: { type: Object, default: null }
     },
     data: () => {
       return {
@@ -53,17 +50,14 @@
     },
     watch: {
       expandItem: {
-        immediate: true,
-        handler(value) {
-          if (value != null) {
-            this.setExpand(value, true);
-          }
+        handler() {
+          this.expanded = [];
         }
       }
     },
     methods: {
-      setExpand(index, isDirect = false) {
-        if (this.expanded.includes(index) && !isDirect) {
+      setExpand(index) {
+        if (this.expanded.includes(index)) {
           this.expanded = this.expanded.filter((expand) => expand !== index);
         } else {
           this.expanded.push(index);

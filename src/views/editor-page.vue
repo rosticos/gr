@@ -184,6 +184,9 @@
         window.URL.revokeObjectURL(url);
       },
       async onImport(viewTree) {
+        this.isVisibleMenu = false;
+        this.expandItem = null;
+
         this.viewTree = viewTree;
 
         this.viewTree = this.viewTree.map((item, index) => {
@@ -289,8 +292,8 @@
 
               this.recount(
                 value,
-                this.viewTree[index].length - 1,
-                index,
+                this.viewTree[index],
+                0,
                 'scatter'
               );
             } else {
@@ -301,8 +304,8 @@
 
               this.recount(
                 value,
-                this.viewTree[index].length - 1,
-                index,
+                this.viewTree[index],
+                0,
                 'scatter'
               );
             }
