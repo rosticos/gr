@@ -99,7 +99,7 @@
         if (type === 'scatter') {
           const lines = item.value[index].values;
 
-          if (value?.['xaxis.range[0]'] && value?.['xaxis.range[1]']) {
+          if (value?.['xaxis.range[0]'] != null && value?.['xaxis.range[1]'] != null) {
             const normalizedLines = lines.map(line => {
               if (line.declareType === 'byFunction' && (value?.['xaxis.range[0]'] < X_MIN || value?.['xaxis.range[1]'] > X_MAX)) {
                 const [xMin, xMax] = [value['xaxis.range[0]'], value['xaxis.range[1]']];

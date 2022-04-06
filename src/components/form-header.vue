@@ -1,11 +1,19 @@
 <template>
   <nav class="nav">
+    <div class="nav__btn" v-on:click="toggleNavigation">
+      Оглавление
+    </div>
+
     <div class="nav__btn" v-on:click="create('graph')">
       График
     </div>
 
     <div class="nav__btn" v-on:click="create('textarea')">
       Текст
+    </div>
+
+    <div class="nav__btn" v-on:click="create('header')">
+      Заголовок
     </div>
 
     <div class="nav__btn" v-on:click="$emit('download')">
@@ -16,6 +24,10 @@
       Импорт
     </div>
 
+    <div class="nav__btn" v-on:click="exportPdf">
+      PDF
+    </div>
+
     <input ref="jsonImporter" type="file" style="display: none;" enctype="multipart/form-data" v-on:change="readFile($event)">
   </nav>
 </template>
@@ -24,6 +36,12 @@
   export default {
     name: 'FormHeader',
     methods: {
+      toggleNavigation() {
+        this.$emit('toggle-navigation');
+      },
+      exportPdf() {
+        this.$emit('export-pdf');
+      },
       create(type) {
         this.$emit(`create-${type}`);
       },

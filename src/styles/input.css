@@ -1,3 +1,8 @@
+textarea.input-block {
+  min-height: 80px !important;
+  resize: none;
+}
+
 .input-block {
   display: block;
   width: 100%;

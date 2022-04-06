@@ -45,7 +45,7 @@
 
         <div class="mt-2">
           <p class="p-input__label">Функция (y=cos(x), y=sin(x) ...)</p>
-          <input v-model="line.value" type="text" class="input-block">
+          <textarea v-model="line.value" type="text" class="input-block" />
         </div>
 
         <div class="mt-2">
