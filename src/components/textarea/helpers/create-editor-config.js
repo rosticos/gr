@@ -4,7 +4,7 @@ export default function createEditorConfig(componentContext) {
     base_url: '/tinymce',
     selector: `#${componentContext.editorId}`,
     height: 500,
-    placeholder: 'Введите текст или вставьте изображение',
+    placeholder: componentContext.placeholder,
     icons_url: '/tinymce/icons/editor-icons/index.js',
     icons: 'editor-icons',
     inline: true,

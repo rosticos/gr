@@ -56,11 +56,22 @@
   z-index: 99;
 }
 
+.plotly__actions_right {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 0px;
+  z-index: 99;
+}
+
 .wrap {
   flex: 1;
   flex-wrap: wrap;
 }
 
-.plotly__actions > .btn + .btn {
+.plotly__actions > .btn + .btn,
+.plotly__actions_right > .btn + .btn {
   margin-top: 16px;
 }

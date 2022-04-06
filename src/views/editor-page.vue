@@ -2,9 +2,12 @@
   <div class="editor-page">
     <div class="constructor-header-toolbar">
       <form-header 
+        v-on:toggle-navigation="onToggleNavigation"
         v-on:create-graph="createGrapg"
         v-on:create-textarea="createTextarea"
+        v-on:create-header="createHeader"
         v-on:import="onImport"
+        v-on:export-pdf="onExportPdf"
         v-on:download="onDownload" />
       <div class="constructor-header-toolbar__tinymce-toolbar" />
     </div>
@@ -14,10 +17,11 @@
         <div class="container">
           <div 
             v-for="(item, index) in viewTree"
+            v-bind:id="item.id"
             v-bind:key="item.id"
             class="document-part document-part-class-free document-part_mode_edit document-part-class-free_mode_edit">
-            <div v-if="item.type === 'graph'" class="document-part_graph">
-              <div class="plotly__actions">
+            <div v-if="item.type === 'graph'" v-bind:id="`document-part_graph-${item.id}`" class="document-part_graph">
+              <div id="ignore" class="plotly__actions">
                 <div
                   class="btn btn_outline ml-2"
                   v-on:click="removeItem(index)">
@@ -28,6 +32,23 @@
                   <div class="p-icon p-icon-edit" />
                 </div>
               </div>
+
+              <div v-if="showMoveActions" id="ignore" class="plotly__actions_right">
+                <div
+                  v-if="index !== 0"
+                  class="btn btn_outline mr-2"
+                  v-on:click="moveUp(index)">
+                  <div class="p-icon p-icon-arrow-up" />
+                </div>
+
+                <div
+                  v-if="index !== viewTree.length - 1"
+                  class="btn btn_outline mr-2"
+                  v-on:click="moveDown(index)">
+                  <div class="p-icon p-icon-arrow-down" />
+                </div>
+              </div>
+
               <div v-for="graph in item.normalizedValue" v-bind:key="graph.id">
                 <div class="plotly">
                   <plotly
@@ -48,7 +69,7 @@
             </div>
 
             <div v-if="item.type === 'text'">
-              <div class="plotly__actions">
+              <div id="ignore" class="plotly__actions">
                 <div
                   class="btn btn_outline ml-2"
                   v-on:click="removeItem(index)">
@@ -56,9 +77,59 @@
                 </div>
               </div>
 
+              <div v-if="showMoveActions" id="ignore" class="plotly__actions_right">
+                <div
+                  v-if="index !== 0"
+                  class="btn btn_outline mr-2"
+                  v-on:click="moveUp(index)">
+                  <div class="p-icon p-icon-arrow-up" />
+                </div>
+
+                <div
+                  v-if="index !== viewTree.length - 1"
+                  class="btn btn_outline mr-2"
+                  v-on:click="moveDown(index)">
+                  <div class="p-icon p-icon-arrow-down" />
+                </div>
+              </div>
+              
               <div class="textarea-element">
                 <textarea-editor 
                   v-bind:id="`textarea-${item.id}`"
+                  class="textarea-element__edit"
+                  v-bind:value.sync="item.value" />
+              </div>
+            </div>
+
+            <div v-if="item.type === 'header'">
+              <div id="ignore" class="plotly__actions">
+                <div
+                  class="btn btn_outline ml-2"
+                  v-on:click="removeItem(index)">
+                  <div class="p-icon p-icon-close" />
+                </div>
+              </div>
+
+              <div v-if="showMoveActions" id="ignore" class="plotly__actions_right">
+                <div
+                  v-if="index !== 0"
+                  class="btn btn_outline mr-2"
+                  v-on:click="moveUp(index)">
+                  <div class="p-icon p-icon-arrow-up" />
+                </div>
+
+                <div
+                  v-if="index !== viewTree.length - 1"
+                  class="btn btn_outline mr-2"
+                  v-on:click="moveDown(index)">
+                  <div class="p-icon p-icon-arrow-down" />
+                </div>
+              </div>
+              
+              <div class="textarea-element">
+                <textarea-editor 
+                  v-bind:id="`textarea-${item.id}`"
+                  header
                   class="textarea-element__edit"
                   v-bind:value.sync="item.value" />
               </div>
@@ -67,6 +138,10 @@
         </div>
       </div>
     </div>
+
+    <form-navigation 
+      v-bind:value.sync="showNavigation"
+      v-bind:tree="viewTree" />
 
     <div class="section">
       <section
@@ -120,8 +195,12 @@
   import Plotly from '../components/plotly/plotly';
   import BaseGraphNormalize from '@/utils/base-graph-normalize.vue';
   import TextareaEditor from '../components/textarea/textarea-editor.vue';
+  import FormNavigation from '../components/form-navigation.vue';
 
   import { v4 as uuid } from 'uuid';
+
+  import html2pdf from 'html2pdf.js';
+
   // import MathJax from 'mathjax'
 
   export default {
@@ -131,7 +210,8 @@
       CreateForm,
       UpdateForm,
       Plotly,
-      TextareaEditor
+      TextareaEditor,
+      FormNavigation
     },
     extends: BaseGraphNormalize,
     data: () => {
@@ -140,13 +220,47 @@
         error: null,
         action: 'create',
         isVisibleMenu: false,
+        showNavigation: false,
         viewTree: []
       };
+    },
+    computed: {
+      showMoveActions() {
+        return this.viewTree.length > 1;
+      }
     },
     mounted() {
       this.createTextarea('Импортируйте имеющийся документ или начните создавать новый с добавления блоков <b>«График»</b> или <b>«Текст»</b>.');
     },
     methods: {
+      onToggleNavigation() {
+        this.showNavigation = !this.showNavigation;
+      },
+      onExportPdf() {
+        var element = document.querySelector('.wrapper');
+        var opt = {
+          image: { type: 'jpeg', quality: 1 },
+          html2canvas:  { 
+            scale: 2, 
+            ignoreElements: (item) => {
+              if (item.id === 'ignore') {
+                return true;
+              }
+            } 
+          },
+          pagebreak: { mode: ['avoid-all'] },
+          jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
+        };
+
+        // New Promise-based usage:
+        html2pdf().set(opt).from(element).save('doc.pdf');
+      },
+      moveUp(index) {
+        this.viewTree.splice(index - 1, 0, this.viewTree.splice(index, 1)[0]);
+      },
+      moveDown(index) {
+        this.viewTree.splice(index + 1, 0, this.viewTree.splice(index, 1)[0]);
+      },
       normalizeViewTree(viewTree) {
         return viewTree.map(v => {
           if (v.type === 'graph') {
@@ -159,6 +273,13 @@
           }
 
           if (v.type === 'text') {
+            return {
+              type: v.type,
+              value: v.value
+            };
+          }
+
+          if (v.type === 'header') {
             return {
               type: v.type,
               value: v.value
@@ -239,6 +360,13 @@
         this.viewTree.push({
           id: uuid(),
           type: 'text',
+          value: `<p>${ initValue }</p>`
+        });
+      },
+      createHeader(initValue = '') {
+        this.viewTree.push({
+          id: uuid(),
+          type: 'header',
           value: `<p>${ initValue }</p>`
         });
       },

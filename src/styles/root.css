@@ -3,10 +3,11 @@
 
   --s-input-padding: 6px 20px;
   --m-input-padding: 10px 20px;
-
+  
   --s-btn-padding: 5px;
   --m-btn-padding: 10px;
   
+  --color-white: #ffffff;
   --color-light-grey: #e2e5eb;
   --color-white-smoke: #F2F3F7;
   --color-light-grey-transparent: rgba(226, 229, 235, .18);
@@ -17,6 +18,7 @@
   --color-link: #0097FD;
   --color-link-active: #45B6FC;
   
+  --base-padding: 20px 10px;
   --base-gap: 16px;
   --base-radius: 10px;
   --base-shadow: 0px 0px 8px rgba(0, 20, 36, 0.02), 0px 2px 8px rgba(0, 20, 36, 0.1);

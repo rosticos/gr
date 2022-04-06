@@ -2,6 +2,7 @@
   <div class="textarea-element-edit textarea-element-edit_mode_edit">
     <div 
       v-bind:id="editorId"
+      v-bind:class="{ 'textarea-element-edit__editor_header': header }"
       class="textarea-element-edit__editor" />
   </div>
 </template>
@@ -46,7 +47,8 @@
     props: {
       id: { required: true, type: String },
       value: { default: '', type: String },
-      mode: { default: Modes.EDIT, type: String }
+      mode: { default: Modes.EDIT, type: String },
+      header: { default: false, type: Boolean }
     },
     data() {
       return {
@@ -56,11 +58,13 @@
         isFocused: false,
         editor: null,
         editorId: null,
-        tinymceIsDirty: false,
-        placeholder: 'Напишите здесь необходимую информацию'
+        tinymceIsDirty: false
       };
     },
     computed: {
+      placeholder() {
+        return this.header ? 'Введите заголовок' : 'Напишите здесь необходимую информацию';
+      },
       syncValue: {
         set(value) {
           this.$emit('update:value', value);
@@ -129,6 +133,11 @@
   }
   .textarea-element-edit__editor {
     font-size: 14px !important;
+    line-height: 24px;
+  }
+  .textarea-element-edit__editor_header {
+    font-size: 17px !important;
+    font-weight: 700 !important;
     line-height: 24px;
   }
   .mce-content-body div.mce-resizehandle {
