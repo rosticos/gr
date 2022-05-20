@@ -13,6 +13,7 @@
     "@wiris/mathtype-tinymce5": "^7.27.0",
     "babel-polyfill": "^6.26.0",
     "core-js": "^3.6.5",
+    "crypto-js": "^4.1.1",
     "eslint-plugin-vue": "7.17.0",
     "html2canvas": "^1.4.1",
     "html2pdf.js": "^0.10.1",

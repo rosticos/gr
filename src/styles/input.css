@@ -3,6 +3,10 @@ textarea.input-block {
   resize: none;
 }
 
+textarea.input-block:disabled {
+  cursor: not-allowed;
+}
+
 .input-block {
   display: block;
   width: 100%;
@@ -19,6 +23,7 @@ textarea.input-block {
   border-radius: var(--base-radius);
 }
 
+
 .input-block:hover { 
   border-color: var(--color-grey); 
 } 
@@ -30,6 +35,11 @@ textarea.input-block {
 
 .input-block + .input-block {
   margin-top: 16px;
+}
+
+.input-block:disabled {
+  background: var(--color-white-smoke);
+  border-color: var(--color-light-grey); 
 }
 
 .p-input__label {

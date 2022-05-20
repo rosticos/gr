@@ -116,7 +116,6 @@
               'xaxis.range[1]': Math.max(...xArray)
             };
 
-            this.recount(value, index);
             this.recount(value, this.expandItem, index, 'scatter');
           } else {
             const value = {

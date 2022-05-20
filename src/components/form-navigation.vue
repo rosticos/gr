@@ -10,9 +10,9 @@
 
     <div class="form-navigation__body">
       <div ref="formNavigation" class="form-navigation__structure">
-        <div class="form-navigation__structure-slider" v-bind:style="sliderStyles" />
+        <div v-if="headings.length" class="form-navigation__structure-slider" v-bind:style="sliderStyles" />
 
-        <div ref="structureHeadingsElement" class="form-navigation__structure-headings">
+        <div v-if="headings.length" ref="structureHeadingsElement" class="form-navigation__structure-headings">
           <div 
             v-for="heading in headings" 
             v-bind:id="heading.id"
@@ -20,7 +20,7 @@
             class="form-navigation__structure-heading-item"
             v-on:click="scrollToHeading(heading)">
             <div v-if="heading.type === 'header'">
-              <span v-html="heading.title" />
+              <span>{{ toText(heading.title) }}</span>
             </div>
 
             <div v-if="heading.type === 'text'">
@@ -31,6 +31,12 @@
               {{ toText(heading.title) }}
             </div>
           </div>
+        </div>
+
+        <div v-else>
+          <span>
+            Для наличия оглавления - добавьте заголовки
+          </span>
         </div>
       </div>
     </div>
@@ -110,6 +116,7 @@
     watch: {
       tree: { 
         immediate: true,
+        deep: true,
         async handler(value) {
           if (value) {
             this.createTree();
@@ -141,23 +148,7 @@
               title: n.value
             };
           }
-
-          if (n.type === 'text') {
-            return {
-              id: n.id,
-              type: n.type,
-              title: n.value
-            };
-          }
-
-          if (n.type === 'graph') {
-            return {
-              id: n.id,
-              type: n.type,
-              title: n.value[0].layout.title
-            };
-          }
-        });
+        }).filter(i => i);
       },
       updateSliderStyles() {
         if (!this.activeHeadingElementRect) {
@@ -182,15 +173,17 @@
 
         this.createTree();
 
-        const targetHeading = heading || this.getNearestHeading();
+        if (this.headings.length) {
+          const targetHeading = heading || this.getNearestHeading();
 
-        this.activeHeadingIndex = this.headings.findIndex(h => h.id === targetHeading.id);
+          this.activeHeadingIndex = this.headings.findIndex(h => h.id === targetHeading.id);
 
-        await this.$nextTick(); // Необходимо время на рендеринг элемента заголовка в структуре
+          await this.$nextTick(); // Необходимо время на рендеринг элемента заголовка в структуре
 
-        this.activeHeadingElementRect = this.$refs.structureHeadingsElement.children[this.activeHeadingIndex]?.getBoundingClientRect() ?? null;
+          this.activeHeadingElementRect = this.$refs.structureHeadingsElement.children[this.activeHeadingIndex]?.getBoundingClientRect() ?? null;
 
-        this.updateSliderStyles();
+          this.updateSliderStyles();
+        }
       },
       async scrollToHeading(headingItem) {
         let headingElement= null;
@@ -225,17 +218,20 @@
 
         const currentY = window.scrollY;
 
-        const nearestHeadingItems = items.map(headingItem => {
-          const headingItemPosition = headingItem.getBoundingClientRect();
-        
-          if (headingItemPosition.y <= currentY) {
-            return headingItem;
-          }
-          return false;
-        }).filter(i => i !== false);
+        if (items.length) {
+          const nearestHeadingItems = items.map(headingItem => {
+            const headingItemPosition = headingItem.getBoundingClientRect();
+          
+            if (headingItemPosition.y <= currentY) {
+              return headingItem;
+            }
+            return false;
+          }).filter(i => i !== false);
 
-      
-        return nearestHeadingItems.length ? { id: nearestHeadingItems.pop().id } : 0;
+        
+          return nearestHeadingItems.length ? { id: nearestHeadingItems.pop().id } : 0;
+        }
+        return [];
       },
       scrollEvenentListener() {
         this.throttledUpdateActiveHeading();
@@ -250,7 +246,7 @@
     position: fixed;
     width: 350px;
     max-width: 350px;
-    margin-top: 38px;
+    top: 39px;
     background: var(--color-white);
     border-right: 1px solid var(--color-light-grey);
     padding: var(--base-padding);

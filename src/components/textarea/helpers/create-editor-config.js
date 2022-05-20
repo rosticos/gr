@@ -24,10 +24,10 @@ export default function createEditorConfig(componentContext) {
     fixed_toolbar_container: '.constructor-header-toolbar__tinymce-toolbar',
     quickbars_selection_toolbar: 'bold italic underline',
     plugins: 'code link lists advlist table tiny_mce_wiris image imagetools quickbars paste',
-    toolbar: 'undo redo | formatselect | ' +
-      ' bold italic backcolor | alignleft aligncenter ' +
+    toolbar: 'undo redo | formatselect | fontsizeselect | ' +
+      ' bold italic backcolor tiny_mce_wiris_formulaEditor  | alignleft aligncenter ' +
       ' alignright alignjustify | bullist numlist outdent indent |' +
-      ' tiny_mce_wiris_formulaEditor | quickimage link table | removeformat',
+      ' quickimage link table | removeformat',
     init_instance_callback: (editor) => {
       editor.setContent(componentContext.syncValue);
     },
@@ -38,7 +38,6 @@ export default function createEditorConfig(componentContext) {
 
       editor.on('input', () => {
         componentContext.onEditorInput();
-
         componentContext.updateTemplate();
 
         // editorScrollIntoView(editor);

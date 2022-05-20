@@ -37,7 +37,6 @@
   padding: 20px;
   width: 100%;
   transition: all .3s ease;
-  cursor: pointer;
   text-align: center;
 }
 
@@ -67,12 +66,8 @@
   background: var(--color-light-grey); 
 } 
 
-.section__btn:hover {
-  background: var(--color-grey);
-}
-
 .section__btn_active {
-  background: var(--color-light-grey);
+  font-weight: 700;
 }
 
 .section__btn + .section__btn {

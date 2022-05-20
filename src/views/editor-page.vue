@@ -3,9 +3,6 @@
     <div class="constructor-header-toolbar">
       <form-header 
         v-on:toggle-navigation="onToggleNavigation"
-        v-on:create-graph="createGrapg"
-        v-on:create-textarea="createTextarea"
-        v-on:create-header="createHeader"
         v-on:import="onImport"
         v-on:export-pdf="onExportPdf"
         v-on:download="onDownload" />
@@ -23,6 +20,7 @@
             <div v-if="item.type === 'graph'" v-bind:id="`document-part_graph-${item.id}`" class="document-part_graph">
               <div id="ignore" class="plotly__actions">
                 <div
+                  v-if="showRemove"
                   class="btn btn_outline ml-2"
                   v-on:click="removeItem(index)">
                   <div class="p-icon p-icon-close" />
@@ -71,6 +69,7 @@
             <div v-if="item.type === 'text'">
               <div id="ignore" class="plotly__actions">
                 <div
+                  v-if="showRemove"
                   class="btn btn_outline ml-2"
                   v-on:click="removeItem(index)">
                   <div class="p-icon p-icon-close" />
@@ -104,6 +103,7 @@
             <div v-if="item.type === 'header'">
               <div id="ignore" class="plotly__actions">
                 <div
+                  v-if="showRemove"
                   class="btn btn_outline ml-2"
                   v-on:click="removeItem(index)">
                   <div class="p-icon p-icon-close" />
@@ -134,6 +134,13 @@
                   v-bind:value.sync="item.value" />
               </div>
             </div>
+            
+            <textarea-dropdown
+              id="ignore"
+              class="textarea-dropdown"
+              v-on:create-graph="createGrapg(index + 1)"
+              v-on:create-textarea="createTextarea('', index + 1)"
+              v-on:create-header="createHeader('', index + 1)" />
           </div>
         </div>
       </div>
@@ -158,29 +165,25 @@
         <div class="section-container__block">
           <div class="section-container__actions">
             <div
+              v-if="action === 'create'"
               class="section__btn"
-              v-bind:class="{ section__btn_active: action === 'create' }"
-              v-on:click="action = 'create'">
+              v-bind:class="{ section__btn_active: action === 'create' }">
               Создание
             </div>
             <div
+              v-if="action === 'edit'"
               class="section__btn"
-              v-bind:class="{ section__btn_active: action === 'edit' }"
-              v-on:click="action = 'edit'">
+              v-bind:class="{ section__btn_active: action === 'edit' }">
               Редактирование
             </div>
           </div>
           <div v-if="action === 'create'" class="section-container__content">
-            <keep-alive>
-              <create-form v-on:create="onCreate" />
-            </keep-alive>
+            <create-form v-on:create="onCreate" />
           </div>
           <div v-if="action === 'edit'" class="section-container__content">
-            <keep-alive>
-              <update-form
-                v-bind:expand-item="expandItem"
-                v-on:update="onUpdate" />
-            </keep-alive>
+            <update-form
+              v-bind:expand-item="expandItem"
+              v-on:update="onUpdate" />
           </div>
         </div>
       </section>
@@ -196,10 +199,15 @@
   import BaseGraphNormalize from '@/utils/base-graph-normalize.vue';
   import TextareaEditor from '../components/textarea/textarea-editor.vue';
   import FormNavigation from '../components/form-navigation.vue';
+  import TextareaDropdown from '../components/textarea/textarea-dropdown.vue';
 
   import { v4 as uuid } from 'uuid';
 
   import html2pdf from 'html2pdf.js';
+  import AES from 'crypto-js/aes';
+  import EncUtf8 from 'crypto-js/enc-utf8';
+  const SECRET = 'SECRET_KEY';
+
 
   // import MathJax from 'mathjax'
 
@@ -211,12 +219,14 @@
       UpdateForm,
       Plotly,
       TextareaEditor,
-      FormNavigation
+      FormNavigation,
+      TextareaDropdown
     },
     extends: BaseGraphNormalize,
     data: () => {
       return {
         expandItem: null,
+        createIndex: null,
         error: null,
         action: 'create',
         isVisibleMenu: false,
@@ -227,6 +237,9 @@
     computed: {
       showMoveActions() {
         return this.viewTree.length > 1;
+      },
+      showRemove() {
+        return this.viewTree.length > 0;
       }
     },
     mounted() {
@@ -291,7 +304,10 @@
       },
       onDownload() {
         const a = window.document.createElement('a');
-        var file = new Blob([JSON.stringify(this.normalizeViewTree(this.viewTree))], {type: 'text/plain'});
+        // Encrypt
+        const encoded = AES.encrypt(JSON.stringify(this.normalizeViewTree(this.viewTree)), SECRET).toString();
+        const file = new Blob([ encoded ], {type: 'text/plain'});
+
         const url = URL.createObjectURL(file);
 
         a.href = url;
@@ -304,29 +320,42 @@
 
         window.URL.revokeObjectURL(url);
       },
-      async onImport(viewTree) {
+      onImport(code) {
         this.isVisibleMenu = false;
         this.expandItem = null;
+        const recalculate = [];
 
-        this.viewTree = viewTree;
+        // Decrypt
+        const bytes  = AES.decrypt(code, SECRET);
+        const viewTree = JSON.parse(bytes.toString(EncUtf8));
 
-        this.viewTree = this.viewTree.map((item, index) => {
+        this.viewTree = viewTree.map((item, index) => {
           if (item.type === 'graph') {
-            item.value.map((graph) => {
-              this.onCreate(
-                {
-                  index,
-                  values: graph.values,
-                  layout: graph.layout,
-                  type: graph.values[0].type
-                },
-                true
-              );
+            const { values, layout } = item.value[0];
+            const { type } = values[0];
+
+            const res = this.onImportGraph({
+              values,
+              layout,
+              type
             });
+
+            item.normalizedValue[0] = { ...res };
+
+            if (type === 'scatter') {
+              recalculate.push(index);
+            }
           }
 
           if (item.type === 'text') {
-            //
+            return {
+              id: uuid(),
+              type: item.type,
+              value: item.value
+            };
+          }
+
+          if (item.type === 'header') {
             return {
               id: uuid(),
               type: item.type,
@@ -336,10 +365,49 @@
 
           return item;
         });
+
+        recalculate.forEach(i => {
+          const { values, layout } = this.viewTree[i].value[0];
+          
+          let value = {
+            'xaxis.range[0]': 0,
+            'xaxis.range[1]': 0
+          };
+
+          if (values.some((value) => value.declareType === 'byCoords')) {
+            const xArray = values
+              .map((item) => {
+                if (item.declareType === 'byCoords') {
+                  return item.value.map((item) => item.x);
+                }
+                return [];
+              })
+              .flat();
+
+            value = {
+              'xaxis.range[0]': Math.min(...xArray),
+              'xaxis.range[1]': Math.max(...xArray)
+            };
+          } else {
+            value = {
+              'xaxis.range[0]': layout.xaxis.range[0],
+              'xaxis.range[1]': layout.xaxis.range[1]
+            };
+          }
+
+          this.recount(
+            value,
+            this.viewTree[i],
+            0,
+            'scatter'
+          );
+        });
       },
-      createGrapg() {
+      createGrapg(index) {
         this.isVisibleMenu = true;
         this.action = 'create';
+
+        this.createIndex = index;
       },
       editGraph(item) {
         this.isVisibleMenu = true;
@@ -355,42 +423,102 @@
 
           return true;
         });
-      },
-      createTextarea(initValue = '') {
-        this.viewTree.push({
-          id: uuid(),
-          type: 'text',
-          value: `<p>${ initValue }</p>`
-        });
-      },
-      createHeader(initValue = '') {
-        this.viewTree.push({
-          id: uuid(),
-          type: 'header',
-          value: `<p>${ initValue }</p>`
-        });
-      },
-      onUpdate() {
-        //
-        this.isVisibleMenu = false;
-      },
-      onCreate({ index, values, layout, type }, isMountEvent = false) {
-        this.error = null;
 
-        if (!isMountEvent) {
+        if (this.viewTree.length === 0) {
+          this.createTextarea('Импортируйте имеющийся документ или начните создавать новый с добавления блоков <b>«График»</b> или <b>«Текст»</b>.');
+        }
+      },
+      createTextarea(initValue = '', index = null) {
+        if (index != null) {
+          this.viewTree.splice(index, 0, {
+            id: uuid(),
+            type: 'text',
+            value: `<p>${ initValue }</p>`
+          });
+        } else {
           this.viewTree.push({
             id: uuid(),
-            type: 'graph',
-            value: [{ values, layout, type }],
-            normalizedValue: []
+            type: 'text',
+            value: `<p>${ initValue }</p>`
           });
-
-          this.isVisibleMenu = false;
         }
-
-        if (index == null) {
-          index = this.viewTree.length - 1;
+      },
+      createHeader(initValue = '', index = 0) {
+        if (index != null) {
+          this.viewTree.splice(index, 0, {
+            id: uuid(),
+            type: 'header',
+            value: `<p>${ initValue }</p>`
+          });
+        } else {
+          this.viewTree.push({
+            id: uuid(),
+            type: 'header',
+            value: `<p>${ initValue }</p>`
+          });
         }
+      },
+      onUpdate() {
+        this.isVisibleMenu = false;
+      },
+      onImportGraph({ values, layout, type }) {
+        this.error = null;
+
+        try {
+          if (type === 'scatter') {
+            const normalizedLines = values.map((line) =>
+              this.normalizeLine(line)
+            );
+
+            return {
+              layout: JSON.parse(JSON.stringify(layout)),
+              data: normalizedLines
+            };
+          }
+
+          if (type === 'pie') {
+            const normalizedPies = values.map((pie, index) =>
+              this.normalizePie(pie, index / 2, index % 2)
+            );
+
+            return {
+              layout: {
+                ...layout,
+                grid: {
+                  rows: Math.ceil(normalizedPies.length / 2),
+                  columns: normalizedPies.length === 1 ? 1 : 2
+                }
+              },
+              data: normalizedPies
+            };
+          }
+
+          if (type === 'bar') {
+            const normalizedBars = values.map((bar) => this.normalizeBar(bar));
+            return {
+              layout: {
+                ...layout,
+                barmode: 'group'
+              },
+              data: normalizedBars
+            };
+          }
+        } catch (error) {
+          this.error = error;
+        }
+      },
+      onCreate({ index = this.createIndex, values, layout, type }) {
+        this.error = null;
+
+        this.viewTree.splice(this.createIndex, 0, {
+          id: uuid(),
+          type: 'graph',
+          value: [{ values, layout, type }],
+          normalizedValue: []
+        });
+
+        this.isVisibleMenu = false;
+        this.createIndex = null;
 
         try {
           if (type === 'scatter') {
@@ -403,6 +531,11 @@
               data: normalizedLines
             });
 
+            let value = {
+              'xaxis.range[0]': 0,
+              'xaxis.range[1]': 0
+            };
+
             if (values.some((value) => value.declareType === 'byCoords')) {
               const xArray = values
                 .map((item) => {
@@ -413,30 +546,23 @@
                 })
                 .flat();
 
-              const value = {
+              value = {
                 'xaxis.range[0]': Math.min(...xArray),
                 'xaxis.range[1]': Math.max(...xArray)
               };
-
-              this.recount(
-                value,
-                this.viewTree[index],
-                0,
-                'scatter'
-              );
             } else {
-              const value = {
+              value = {
                 'xaxis.range[0]': layout.xaxis.range[0],
                 'xaxis.range[1]': layout.xaxis.range[1]
               };
-
-              this.recount(
-                value,
-                this.viewTree[index],
-                0,
-                'scatter'
-              );
             }
+
+            this.recount(
+              value,
+              this.viewTree[index],
+              0,
+              'scatter'
+            );
           }
 
           if (type === 'pie') {
@@ -509,17 +635,22 @@
   .constructor-header-toolbar {
     background-color: #fff;
     border-bottom: 1px solid var(--color-light-grey);
-    display: flex;
-    height: 38px;
+    display: grid;
+    grid-template-columns: 370px 1fr;
     padding: 0px;
     width: 100%;
     position: fixed;
     z-index: 100;
+    height: 39px;
   }
+
   .constructor-header-toolbar__structure {
     margin-right: 8px;
   }
-  .constructor-header-toolbar__tinymce-toolbar {}
+
+  .constructor-header-toolbar__tinymce-toolbar .tox-tinymce-inline {
+    border-top: 1px solid var(--color-light-grey);
+  }
 
   .textarea-element {
     font-family: Arial, sans-serif !important;
@@ -558,5 +689,18 @@
   }
   .textarea-element td {
     padding: 5px 8px;
+  }
+
+  .textarea-dropdown {
+    display: none;
+  }
+  .document-part:hover .textarea-dropdown {
+    display: flex;
+    opacity: 1;
+    z-index: 100;
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
   }
 </style>

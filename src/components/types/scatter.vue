@@ -63,7 +63,11 @@
         <div>
           <div class="mt-2">
             <div v-for="(cons, consIndex) in line.constsArray" v-bind:key="consIndex">
-              <div class="d-flex">
+              <div class="d-flex align-center">
+                <div>
+                  <p class="p-input__label">&nbsp;</p>
+                  <gr-checkbox v-model="cons.disabled" />
+                </div>
                 <div>
                   <p class="p-input__label">Название</p>
                   <input v-model="cons.name" type="text" class="input-block">
@@ -91,7 +95,7 @@
           <input v-model="line.name" type="text" class="input-block">
         </div>
 
-        <div v-for="(value, valueIndex) in line.value" v-bind:key="valueIndex" class="d-flex mt-4">
+        <div v-for="(value, valueIndex) in line.value" v-bind:key="valueIndex" class="d-flex mt-4 card__content">
           <div>
             <p class="p-input__label">X:</p>
             <input v-model="value.x" type="text" class="input-block">
@@ -165,7 +169,7 @@
 
 <script>
   export default {
-    name: 'Pie',
+    name: 'Scatter',
     data: () => {
       return {
         submitText: 'Создать',
@@ -190,7 +194,8 @@
             value: 'y=f*x',
             constsArray: [{
               name: 'f',
-              value: 1
+              value: 1,
+              disabled: true
             }]
           }
         ]

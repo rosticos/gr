@@ -1,19 +1,11 @@
 <template>
   <nav class="nav">
     <div class="nav__btn" v-on:click="toggleNavigation">
-      Оглавление
+      <div class="p-icon p-icon-contents" />
     </div>
 
-    <div class="nav__btn" v-on:click="create('graph')">
-      График
-    </div>
-
-    <div class="nav__btn" v-on:click="create('textarea')">
-      Текст
-    </div>
-
-    <div class="nav__btn" v-on:click="create('header')">
-      Заголовок
+    <div class="nav__btn" v-on:click="exportPdf">
+      PDF
     </div>
 
     <div class="nav__btn" v-on:click="$emit('download')">
@@ -22,10 +14,6 @@
 
     <div class="nav__btn" v-on:click="$refs.jsonImporter.click()">
       Импорт
-    </div>
-
-    <div class="nav__btn" v-on:click="exportPdf">
-      PDF
     </div>
 
     <input ref="jsonImporter" type="file" style="display: none;" enctype="multipart/form-data" v-on:change="readFile($event)">
@@ -51,7 +39,7 @@
         const reader = new FileReader();
 
         reader.onload = (event) => {
-          this.$emit('import', JSON.parse(event.target.result));
+          this.$emit('import', event.target.result);
         };
 
         reader.readAsText(file);
@@ -63,6 +51,7 @@
 <style>
   .nav {
     display: flex;
+    height: 37px;
   }
 
   .nav__btn {
@@ -71,6 +60,7 @@
     padding: 0 20px;
     transition: background .3s ease;
     cursor: pointer;
+    height: 38px;
   }
 
   .nav__btn + .nav__btn {}

@@ -5,6 +5,10 @@ import store from './store';
 
 import './main.css';
 
+import GrCheckbox from '@/utils/components/gr-checkbox.vue';
+
+Vue.component('GrCheckbox', GrCheckbox);
+
 Vue.config.productionTip = false;
 
 new Vue({
