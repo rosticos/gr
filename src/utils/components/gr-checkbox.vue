@@ -13,7 +13,7 @@
       </symbol>
     </div>
 
-    <div>
+    <div v-if="label">
       <p class="checkbox__label">
         <!-- @slot Текст чекбокса -->
         <slot>{{ label }}</slot>
@@ -55,6 +55,11 @@
     cursor: pointer;
     outline: none;
     vertical-align: top;
+    width: 24px;
+  }
+
+  .checkbox__label {
+    margin-left: 8px;
   }
 
   .checkbox__input {

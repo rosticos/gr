@@ -1,9 +1,10 @@
 <template>
   <div class="editor-page">
-    <div class="constructor-header-toolbar">
+    <div class="constructor-header-toolbar" v-bind:class="[`constructor-header-toolbar_${appMode}`]">
       <form-header 
         v-on:toggle-navigation="onToggleNavigation"
         v-on:import="onImport"
+        v-on:importWithout="onImportWithout"
         v-on:export-pdf="onExportPdf"
         v-on:download="onDownload" />
       <div class="constructor-header-toolbar__tinymce-toolbar" />
@@ -16,7 +17,10 @@
             v-for="(item, index) in viewTree"
             v-bind:id="item.id"
             v-bind:key="item.id"
-            class="document-part document-part-class-free document-part_mode_edit document-part-class-free_mode_edit">
+            v-bind:class="[
+              `document-part_mode_${appMode}`
+            ]"
+            class="document-part">
             <div v-if="item.type === 'graph'" v-bind:id="`document-part_graph-${item.id}`" class="document-part_graph">
               <div id="ignore" class="plotly__actions">
                 <div
@@ -67,12 +71,14 @@
             </div>
 
             <div v-if="item.type === 'text'">
-              <div id="ignore" class="plotly__actions">
+              <div v-if="showRemove" id="ignore" class="plotly__actions">
                 <div
-                  v-if="showRemove"
                   class="btn btn_outline ml-2"
                   v-on:click="removeItem(index)">
                   <div class="p-icon p-icon-close" />
+                </div>
+                <div class="d-flex align-center mt-2 ml-4">
+                  <gr-checkbox v-model="item.disabled" />
                 </div>
               </div>
 
@@ -93,7 +99,9 @@
               </div>
               
               <div class="textarea-element">
+                <div v-if="isDisabled(item.disabled)" v-html="item.value" />
                 <textarea-editor 
+                  v-else
                   v-bind:id="`textarea-${item.id}`"
                   class="textarea-element__edit"
                   v-bind:value.sync="item.value" />
@@ -101,12 +109,14 @@
             </div>
 
             <div v-if="item.type === 'header'">
-              <div id="ignore" class="plotly__actions">
+              <div v-if="showRemove" id="ignore" class="plotly__actions">
                 <div
-                  v-if="showRemove"
                   class="btn btn_outline ml-2"
                   v-on:click="removeItem(index)">
                   <div class="p-icon p-icon-close" />
+                </div>
+                <div class="d-flex align-center mt-2 ml-4">
+                  <gr-checkbox v-model="item.disabled" />
                 </div>
               </div>
 
@@ -125,9 +135,11 @@
                   <div class="p-icon p-icon-arrow-down" />
                 </div>
               </div>
-              
-              <div class="textarea-element">
+
+              <div v-else class="textarea-element">
+                <div v-if="isDisabled(item.disabled)" v-html="item.value" />
                 <textarea-editor 
+                  v-else
                   v-bind:id="`textarea-${item.id}`"
                   header
                   class="textarea-element__edit"
@@ -136,6 +148,7 @@
             </div>
             
             <textarea-dropdown
+              v-if="isEditMode"
               id="ignore"
               class="textarea-dropdown"
               v-on:create-graph="createGrapg(index + 1)"
@@ -155,6 +168,7 @@
         class="section-container"
         v-bind:class="{ 'section-container_hide': !isVisibleMenu }">
         <div
+          v-if="expandItem || createIndex"
           class="section__btn_close"
           v-on:click="isVisibleMenu = !isVisibleMenu">
           <div
@@ -177,9 +191,11 @@
               Редактирование
             </div>
           </div>
-          <div v-if="action === 'create'" class="section-container__content">
+
+          <div v-if="action === 'create' && isEditMode" class="section-container__content">
             <create-form v-on:create="onCreate" />
           </div>
+
           <div v-if="action === 'edit'" class="section-container__content">
             <update-form
               v-bind:expand-item="expandItem"
@@ -206,10 +222,6 @@
   import html2pdf from 'html2pdf.js';
   import AES from 'crypto-js/aes';
   import EncUtf8 from 'crypto-js/enc-utf8';
-  const SECRET = 'SECRET_KEY';
-
-
-  // import MathJax from 'mathjax'
 
   export default {
     name: 'Home',
@@ -236,16 +248,19 @@
     },
     computed: {
       showMoveActions() {
-        return this.viewTree.length > 1;
+        return this.viewTree.length > 1 && this.isEditMode;
       },
       showRemove() {
-        return this.viewTree.length > 0;
+        return this.viewTree.length > 0 && this.isEditMode;
       }
     },
     mounted() {
       this.createTextarea('Импортируйте имеющийся документ или начните создавать новый с добавления блоков <b>«График»</b> или <b>«Текст»</b>.');
     },
     methods: {
+      isDisabled(disabled) {
+        return disabled && this.isViewMode;
+      },
       onToggleNavigation() {
         this.showNavigation = !this.showNavigation;
       },
@@ -288,14 +303,16 @@
           if (v.type === 'text') {
             return {
               type: v.type,
-              value: v.value
+              value: v.value,
+              disabled: v.disabled || false
             };
           }
 
           if (v.type === 'header') {
             return {
               type: v.type,
-              value: v.value
+              value: v.value,
+              disabled: v.disabled || false
             };
           }
 
@@ -305,7 +322,7 @@
       onDownload() {
         const a = window.document.createElement('a');
         // Encrypt
-        const encoded = AES.encrypt(JSON.stringify(this.normalizeViewTree(this.viewTree)), SECRET).toString();
+        const encoded = AES.encrypt(JSON.stringify(this.normalizeViewTree(this.viewTree)), process.env.VUE_APP_SECRET).toString();
         const file = new Blob([ encoded ], {type: 'text/plain'});
 
         const url = URL.createObjectURL(file);
@@ -326,8 +343,89 @@
         const recalculate = [];
 
         // Decrypt
-        const bytes  = AES.decrypt(code, SECRET);
+        const bytes  = AES.decrypt(code, process.env.VUE_APP_SECRET);
         const viewTree = JSON.parse(bytes.toString(EncUtf8));
+
+        this.viewTree = viewTree.map((item, index) => {
+          if (item.type === 'graph') {
+            const { values, layout } = item.value[0];
+            const { type } = values[0];
+
+            const res = this.onImportGraph({
+              values,
+              layout,
+              type
+            });
+
+            item.normalizedValue[0] = { ...res };
+
+            if (type === 'scatter') {
+              recalculate.push(index);
+            }
+          }
+
+          if (item.type === 'text') {
+            return {
+              id: uuid(),
+              type: item.type,
+              value: item.value,
+              disabled: item.disabled || false
+            };
+          }
+
+          if (item.type === 'header') {
+            return {
+              id: uuid(),
+              type: item.type,
+              value: item.value,
+              disabled: item.disabled || false
+            };
+          }
+
+          return item;
+        });
+
+        recalculate.forEach(i => {
+          const { values, layout } = this.viewTree[i].value[0];
+          
+          let value = {
+            'xaxis.range[0]': 0,
+            'xaxis.range[1]': 0
+          };
+
+          if (values.some((value) => value.declareType === 'byCoords')) {
+            const xArray = values
+              .map((item) => {
+                if (item.declareType === 'byCoords') {
+                  return item.value.map((item) => item.x);
+                }
+                return [];
+              })
+              .flat();
+
+            value = {
+              'xaxis.range[0]': Math.min(...xArray),
+              'xaxis.range[1]': Math.max(...xArray)
+            };
+          } else {
+            value = {
+              'xaxis.range[0]': layout.xaxis.range[0],
+              'xaxis.range[1]': layout.xaxis.range[1]
+            };
+          }
+
+          this.recount(
+            value,
+            this.viewTree[i],
+            0,
+            'scatter'
+          );
+        });
+      },
+      onImportWithout(viewTree) {
+        this.isVisibleMenu = false;
+        this.expandItem = null;
+        const recalculate = [];
 
         this.viewTree = viewTree.map((item, index) => {
           if (item.type === 'graph') {
@@ -433,13 +531,15 @@
           this.viewTree.splice(index, 0, {
             id: uuid(),
             type: 'text',
-            value: `<p>${ initValue }</p>`
+            value: `<p>${ initValue }</p>`,
+            disabled: false
           });
         } else {
           this.viewTree.push({
             id: uuid(),
             type: 'text',
-            value: `<p>${ initValue }</p>`
+            value: `<p>${ initValue }</p>`,
+            disabled: false
           });
         }
       },
@@ -448,13 +548,15 @@
           this.viewTree.splice(index, 0, {
             id: uuid(),
             type: 'header',
-            value: `<p>${ initValue }</p>`
+            value: `<p>${ initValue }</p>`,
+            disabled: false
           });
         } else {
           this.viewTree.push({
             id: uuid(),
             type: 'header',
-            value: `<p>${ initValue }</p>`
+            value: `<p>${ initValue }</p>`,
+            disabled: false
           });
         }
       },
@@ -636,12 +738,19 @@
     background-color: #fff;
     border-bottom: 1px solid var(--color-light-grey);
     display: grid;
-    grid-template-columns: 370px 1fr;
     padding: 0px;
     width: 100%;
     position: fixed;
     z-index: 100;
     height: 39px;
+  }
+
+  .constructor-header-toolbar_edit {
+    grid-template-columns: 520px 1fr;
+  }
+
+  .constructor-header-toolbar_view {
+    grid-template-columns: 370px 1fr;
   }
 
   .constructor-header-toolbar__structure {

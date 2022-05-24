@@ -162,8 +162,8 @@ hr.no-padding {
 }
 
 .my-0 {
-  margin-top: 0;
-  margin-bottom: 0;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 
 .my-4 {
@@ -192,7 +192,11 @@ hr.no-padding {
 }
 
 .ml-2 {
-  margin-left: 8px;
+  margin-left: 8px !important;
+}
+
+.ml-4 {
+  margin-left: 16px !important;
 }
 
 .mr-2 {

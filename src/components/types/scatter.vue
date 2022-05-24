@@ -4,16 +4,23 @@
       <hr>
       <div class="card__content d-flex align-center">
         <p class="p-title-bold">{{ line.name || 'Новая линия' }}</p>
-        <div class="ml-auto btn btn_outline ml-2" v-on:click="removeLine(index)">
+        <div v-if="showInEditMode" class="ml-auto btn btn_outline" v-on:click="removeLine(index)">
           <div class="p-icon p-icon-close" />
         </div>
       </div>
       <hr>
 
-      <div class="card__content d-flex pb-0">
+      <div class="card__content d-flex align-center pb-0">
+        <div v-if="showInEditMode" class="d-flex align-center">
+          <gr-checkbox v-model="line.disabled" />
+          <p class="p-input__label ml-2 my-0">Заблокировать изменения блока "{{ line.name || 'Новая линия' }}"</p>
+        </div>
+      </div>
+
+      <div class="card__content d-flex align-center pb-0">
         <div>
           <p class="p-input__label">Название линии</p>
-          <select v-model="line.declareType" class="input-block select-css" v-on:change="onChangeDeclareType(index)">
+          <select v-model="line.declareType" v-bind:disabled="isDisabled(line.disabled)" class="input-block select-css" v-on:change="onChangeDeclareType(index)">
             <option disabled value="">Способ задания линии</option>
             <option value="byFunction">Функция</option>
             <option value="byCoords">Координаты</option>
@@ -22,91 +29,102 @@
 
         <div class="ml-2">
           <p class="p-input__label">Тип линии</p>
-          <select v-model="line.mode" class="input-block select-css">
+          <select v-model="line.mode" v-bind:disabled="isDisabled(line.disabled)" class="input-block select-css">
             <option disabled value="">Тип отображения линии</option>
             <option value="lines">Линия</option>
             <option value="markers">Маркеры</option>
             <option value="lines+markers">Линия и маркеры</option>
           </select>
         </div>
-
-        <div class="btn-container_s">
-          <div v-if="line.declareType === 'byCoords'" class="btn btn_outline ml-2" v-on:click="addPoint(index)">
-            <div class="p-icon p-icon-add" />
-          </div>
-        </div>
       </div>
 
       <div v-if="line.declareType === 'byFunction'" class=" pt-0 card__content">
         <div>
           <p class="p-input__label">Название линии</p>
-          <input v-model="line.name" type="text" class="input-block">
+          <input v-model="line.name" v-bind:disabled="isDisabled(line.disabled)" type="text" class="input-block">
         </div>
 
         <div class="mt-2">
           <p class="p-input__label">Функция (y=cos(x), y=sin(x) ...)</p>
-          <textarea v-model="line.value" type="text" class="input-block" />
+          <textarea v-model="line.value" v-bind:disabled="isDisabled(line.disabled)" type="text" class="input-block" />
         </div>
 
         <div class="mt-2">
           <p class="p-input__label">Построит функцию относительно ... (x)</p>
-          <input v-model="line.funcRelative" type="text" class="input-block">
+          <input v-model="line.funcRelative" v-bind:disabled="isDisabled(line.disabled)" type="text" class="input-block">
         </div>
 
-        <div class="d-flex my-4">
+        <div class="d-flex mt-4">
           <p class="p-title">Константы</p>
-          <div class="btn btn_outline ml-auto" v-on:click="addConst(index)">
+          <div v-if="showInEditMode" class="btn btn_outline ml-auto" v-on:click="addConst(index)">
             <div class="p-icon p-icon-add" />
           </div>
         </div>
 
         <div>
-          <div class="mt-2">
-            <div v-for="(cons, consIndex) in line.constsArray" v-bind:key="consIndex">
-              <div class="d-flex align-center">
-                <div>
-                  <p class="p-input__label">&nbsp;</p>
-                  <gr-checkbox v-model="cons.disabled" />
-                </div>
-                <div>
-                  <p class="p-input__label">Название</p>
-                  <input v-model="cons.name" type="text" class="input-block">
-                </div>
+          <div v-for="(cons, consIndex) in line.constsArray" v-bind:key="consIndex">
+            <div class="d-flex align-center">
+              <div v-if="showInEditMode">
+                <p class="p-input__label">&nbsp;</p>
+                <gr-checkbox v-model="cons.disabled" />
+              </div>
 
-                <div class="ml-2">
-                  <p class="p-input__label">Значение</p>
-                  <input v-model="cons.value" type="text" class="input-block">
-                </div>
+              <div>
+                <p class="p-input__label">Название</p>
+                <input v-model="cons.name" v-bind:disabled="isDisabled(cons.disabled)" type="text" class="input-block">
+              </div>
 
-                <div class="btn-container_s">
-                  <div class="btn btn_outline ml-2" v-on:click="removeConst(index, consIndex)">
-                    <div class="p-icon p-icon-close" />
-                  </div>
+              <div class="ml-2">
+                <p class="p-input__label">Значение</p>
+                <input v-model="cons.value" v-bind:disabled="isDisabled(cons.disabled)" type="text" class="input-block">
+              </div>
+
+              <div v-if="showInEditMode" class="btn-container_s">
+                <div class="btn btn_outline ml-2" v-on:click="removeConst(index, consIndex)">
+                  <div class="p-icon p-icon-close" />
                 </div>
               </div>
+            </div>
+          </div>
+
+          <div class="d-flex align-center mt-4">
+            <div class="d-flex align-center">
+              <p class="p-input__label ml-2 my-0">Чекбокс обозначает блокировку изменения константы</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div v-if="line.declareType === 'byCoords'">
-        <div class="mt-2 card__content">
+      <div v-if="line.declareType === 'byCoords'" class="card__content">
+        <div>
           <p class="p-input__label">Название линии</p>
           <input v-model="line.name" type="text" class="input-block">
         </div>
 
-        <div v-for="(value, valueIndex) in line.value" v-bind:key="valueIndex" class="d-flex mt-4 card__content">
+        <div class="d-flex mt-4">
+          <p class="p-title">Значения</p>
+          <div v-if="showInEditMode" class="btn btn_outline ml-auto" v-on:click="addPoint(index)">
+            <div class="p-icon p-icon-add" />
+          </div>
+        </div>
+
+        <div v-for="(value, valueIndex) in line.value" v-bind:key="valueIndex" class="d-flex align-center">
+          <div v-if="showInEditMode">
+            <p class="p-input__label">&nbsp;</p>
+            <gr-checkbox v-model="value.disabled" />
+          </div>
+
           <div>
             <p class="p-input__label">X:</p>
-            <input v-model="value.x" type="text" class="input-block">
+            <input v-model="value.x" v-bind:disabled="isDisabled(value.disabled)" type="text" class="input-block">
           </div>
 
           <div class="ml-2">
             <p class="p-input__label">Y:</p>
-            <input v-model="value.y" type="text" class="input-block">
+            <input v-model="value.y" v-bind:disabled="isDisabled(value.disabled)" type="text" class="input-block">
           </div>
 
-          <div class="btn-container_s">
+          <div v-if="showInEditMode" class="btn-container_s">
             <div class="btn btn_outline ml-2" v-on:click="removePoint(index, valueIndex)">
               <div class="p-icon p-icon-close" />
             </div>
@@ -121,41 +139,48 @@
     </div>
     <hr>
 
+    <div class="card__content d-flex align-center pb-0">
+      <div v-if="showInEditMode" class="d-flex align-center">
+        <gr-checkbox v-model="layout.disabled" />
+        <p class="p-input__label ml-2 my-0">Заблокировать изменения блока "Настроить график"</p>
+      </div>
+    </div>
+
     <div class="card__content">
       <div>
         <p class="p-input__label">Название графика</p>
-        <input v-model="layout.title" type="text" class="input-block">
+        <input v-model="layout.title" v-bind:disabled="isDisabled(layout.disabled)" type="text" class="input-block">
       </div>
 
       <div>
         <p class="p-input__label">Горизонталь</p>
-        <input v-model="layout.xaxis.title" type="text" class="input-block">
+        <input v-model="layout.xaxis.title" v-bind:disabled="isDisabled(layout.disabled)" type="text" class="input-block">
       </div>
 
       <div>
         <p class="p-input__label">Вертикаль</p>
-        <input v-model="layout.yaxis.title" type="text" class="input-block">
+        <input v-model="layout.yaxis.title" v-bind:disabled="isDisabled(layout.disabled)" type="text" class="input-block">
       </div>
 
       <div>
         <p class="p-input__label">Начальная область по горизонтале:</p>
         <div class="d-flex">
-          <input v-model.number="layout.xaxis.range[0]" type="text" class="input-block">
-          <input v-model.number="layout.xaxis.range[1]" type="text" class="input-block">
+          <input v-model.number="layout.xaxis.range[0]" v-bind:disabled="isDisabled(layout.disabled)" type="text" class="input-block">
+          <input v-model.number="layout.xaxis.range[1]" v-bind:disabled="isDisabled(layout.disabled)" type="text" class="input-block">
         </div>
       </div>
 
       <div>
         <p class="p-input__label">Начальная область по горизонтале:</p>
         <div class="d-flex">
-          <input v-model.number="layout.yaxis.range[0]" type="text" class="input-block">
-          <input v-model.number="layout.yaxis.range[1]" type="text" class="input-block">
+          <input v-model.number="layout.yaxis.range[0]" v-bind:disabled="isDisabled(layout.disabled)" type="text" class="input-block">
+          <input v-model.number="layout.yaxis.range[1]" v-bind:disabled="isDisabled(layout.disabled)" type="text" class="input-block">
         </div>
       </div>
     </div>
 
     <div class="card__content card__actions">
-      <div class="btn btn_outline" v-on:click="addLine">
+      <div v-if="showInEditMode" class="btn btn_outline" v-on:click="addLine">
         <div class="p-icon p-icon-add mr-2" />
         Добавить график
       </div>
@@ -174,6 +199,7 @@
       return {
         submitText: 'Создать',
         layout: {
+          disabled: true,
           title: 'График',
           xaxis: {
             title: 'X',
@@ -187,6 +213,7 @@
         lines: [
           {
             name: 'y=f*x',
+            disabled: false,
             funcRelative: 'x',
             declareType: 'byFunction',
             type: 'scatter',
@@ -201,7 +228,15 @@
         ]
       };
     },
+    computed: {
+      showInEditMode() {
+        return this.isEditMode;
+      }
+    },
     methods: {
+      isDisabled(disabled) {
+        return disabled && this.isViewMode;
+      },
       removeLine(index) {
         this.lines.splice(index, 1);
       },
@@ -209,7 +244,7 @@
         this.lines[index].constsArray.splice(consIndex, 1);
       },
       addConst(index) {
-        this.lines[index].constsArray.push({ name: '', value: '' });
+        this.lines[index].constsArray.push({ name: '', value: '', disabled: false });
       },
       addPoint(index) {
         this.lines[index].value.push({
@@ -225,6 +260,7 @@
           this.lines[index].value = '';
         } else if (this.lines[index].declareType === 'byCoords') {
           this.lines[index].value = [{
+            disabled: false,
             x: '',
             y: ''
           }];

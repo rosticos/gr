@@ -1,13 +1,15 @@
 .document-part {
   background-color: transparent;
-  padding: 40px 64px;
   position: relative;
 }
 .document-part_graph {
   min-height: 128px;
 }
 .document-part_mode_view {
-  padding-bottom: 0;
+  padding: 10px 64px;
+}
+.document-part_mode_edit {
+  padding: 40px 64px;
 }
 .document-part_dragenter,
 .document-part_highlight {
