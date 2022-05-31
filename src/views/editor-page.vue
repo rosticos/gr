@@ -136,7 +136,7 @@
                 </div>
               </div>
 
-              <div v-else class="textarea-element">
+              <div class="textarea-element">
                 <div v-if="isDisabled(item.disabled)" v-html="item.value" />
                 <textarea-editor 
                   v-else
