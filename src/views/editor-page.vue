@@ -255,6 +255,8 @@
       }
     },
     mounted() {
+      this.createTextarea('Импортируйте имеющийся документ или начните создавать новый с добавления блоков <b>«График»</b> или <b>«Текст»</b>.');
+
       const rf = new XMLHttpRequest();
       rf.open('GET', `${process.env.NODE_ENV === 'production' ? '/gr/' : '/'}preview.txt`, false);
 
