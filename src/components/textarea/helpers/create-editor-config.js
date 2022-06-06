@@ -22,10 +22,10 @@ export default function createEditorConfig(componentContext) {
     content_style: 'img {max-width: 100%;}',
     paste_data_images: true,
     fixed_toolbar_container: '.constructor-header-toolbar__tinymce-toolbar',
-    quickbars_selection_toolbar: 'bold italic underline',
+    quickbars_selection_toolbar: 'bold italic underline forecolor backcolor',
     plugins: 'code link lists advlist table tiny_mce_wiris image imagetools quickbars paste',
     toolbar: 'undo redo | formatselect | fontsizeselect | ' +
-      ' bold italic backcolor tiny_mce_wiris_formulaEditor  | alignleft aligncenter ' +
+      ' bold italic underline forecolor backcolor tiny_mce_wiris_formulaEditor  | alignleft aligncenter ' +
       ' alignright alignjustify | bullist numlist outdent indent |' +
       ' quickimage link table | removeformat',
     init_instance_callback: (editor) => {

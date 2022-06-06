@@ -255,14 +255,7 @@
       }
     },
     mounted() {
-      const rf = new XMLHttpRequest();
-      rf.open('GET', '/preview.txt', false);
-
-      rf.onreadystatechange = () => {
-        this.onImport(rf.responseText);
-      };
-
-      rf.send(null);
+      this.createTextarea('Импортируйте имеющийся документ или начните создавать новый с добавления блоков <b>«График»</b> или <b>«Текст»</b>.');
     },
     methods: {
       isDisabled(disabled) {
