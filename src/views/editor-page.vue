@@ -256,7 +256,7 @@
     },
     mounted() {
       const rf = new XMLHttpRequest();
-      rf.open('GET', '../../../preview.txt', false);
+      rf.open('GET', `${process.env.NODE_ENV === 'production' ? '/gr/' : '/'}preview.txt`, false);
 
       rf.onreadystatechange = () => {
         this.onImport(rf.responseText);
