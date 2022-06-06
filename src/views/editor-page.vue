@@ -256,7 +256,7 @@
     },
     mounted() {
       const rf = new XMLHttpRequest();
-      rf.open('GET', '/preview.txt', false);
+      rf.open('GET', '../../../preview.txt', false);
 
       rf.onreadystatechange = () => {
         this.onImport(rf.responseText);
